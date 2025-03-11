@@ -1,6 +1,7 @@
 .env
 
 raw_data/
+preproc_data/
 .python*
 .DS*
-**/*.ipynb
+notebooks/*
