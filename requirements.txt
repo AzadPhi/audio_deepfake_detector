@@ -2,3 +2,5 @@ jupyter
 jupyterlab
 numpy
 pandas
+librosa --no-depsIPython.display
+os
