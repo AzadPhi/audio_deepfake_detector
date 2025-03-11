@@ -4,3 +4,4 @@ raw_data/
 .python*
 .DS*
 **/*.ipynb
+notebooks/
