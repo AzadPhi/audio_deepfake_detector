@@ -6,3 +6,5 @@ preproc_data/
 .DS*
 **/*.ipynb
 notebooks/
+*.egg-info
+

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import os
 import IPython.display as ipd
 import pandas as pd
+from sound_prep.params import *
 
 ### ------------ Etape 1: Definition des paramètres ------------
 
@@ -100,13 +101,19 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
         folder_name = "/".join(pathname.split("/")[:-1]) # Extrait le lien / path
         prep_results_arr = read_as_melspectrogram(conf, pathname)  # Intègre l'array
 
-        data.append([music_id, folder_name, prep_results_arr])
+        if "fake" in folder_name.lower():
+            is_generated=1
 
-    df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array"])
+        else:
+            is_generated=0
+
+        data.append([music_id, folder_name, prep_results_arr, is_generated])
+
+
+    print('all data converted to df')
+    df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array","is_generated"])
     return df
 
 def create_csv(df):
-    df.to_csv('music_preprocessed.csv', index=True)
-
-if __name__ == '__main__':
-    pass
+    df.to_csv(f"{PATH_PROCESSED_DATA}/music_preprocessed.csv", index=True)
+    print('all data saved as csv')
