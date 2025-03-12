@@ -1,12 +1,10 @@
 jupyter
 jupyterlab
-numpy
+numpy==1.25.2
+numba==0.58.0
 pandas
-librosa --no-deps
+librosa==0.9.1
 IPython
-os
 pathlib
 setuptools
-
-
-preprocess # package sound_prep
+matplotlib
