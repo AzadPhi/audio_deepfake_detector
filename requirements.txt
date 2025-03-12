@@ -2,5 +2,11 @@ jupyter
 jupyterlab
 numpy
 pandas
-librosa --no-depsIPython.display
+librosa --no-deps
+IPython
 os
+pathlib
+setuptools
+
+
+preprocess # package sound_prep
