@@ -13,7 +13,7 @@ from nos_paquets.sound_prep.params import *
 class Conf:
     sampling_rate = SAMPLING_RATE  # Fréquence d'échantillonnage (Hz) # on l'a fixé à 16000
     duration = DURATION  # Durée cible en secondes
-    n_mels = N_MELTS  # Nombre de bandes de Mel
+    n_mels = N_MELS  # Nombre de bandes de Mel
 
     hop_length = HOP_LENGTH  # Détermine le nombre de frames temporelles
     fmin = FMIN  # Fréquence minimale
@@ -201,13 +201,13 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
 
             data.append([music_id, folder_name, array_flatten, arr_shape, is_generated])
 
-        ### à insérer avant le modèle :
-        ### array_reshaped = array_flatten.reshape(arr_shape)
-        ### ==> il faut reshape l'array avant de passer dans le modèle
-
 
     df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+
+    df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
+
     print('❤️​🩷​💛​💚​💙​ all data converted to df ❤️​🩷​💛​💚​💙​')
+
     return df
 
 def create_csv(df):
