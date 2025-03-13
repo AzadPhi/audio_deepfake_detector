@@ -110,12 +110,10 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
         data.append([music_id, folder_name, prep_results_arr, is_generated])
 
 
+    print('all data converted to df')
     df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array","is_generated"])
-    print('❤️​🩷​💛​💚​💙​ all data converted to df ❤️​🩷​💛​💚​💙​')
     return df
 
 def create_csv(df):
-    df.to_csv(f"/home/{os.environ.get('USER_NAME')}/audio_deepfake_detector/processed_data/music_preprocessed.csv",
-              index=True)
-    print('❤️​🩷​💛​💚​💙​ all data saved as csv ❤️​🩷​💛​💚​💙​')
-
+    df.to_csv(f"{PATH_PROCESSED_DATA}/music_preprocessed.csv", index=True)
+    print('all data saved as csv')
