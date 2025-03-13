@@ -14,7 +14,7 @@ def download_data_from_cloud(bucket_name, path_to_raw_data, data_size):
 
     bucket = client.bucket(bucket_name)
 
-    if data_size==all:
+    if data_size=="tout":
         blob_names = [blob.name for blob in bucket.list_blobs()]
         # when no argument max_results is passed, it takes all the blobs
 
