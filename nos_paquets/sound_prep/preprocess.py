@@ -26,6 +26,9 @@ conf = Conf()
 ### ------------ Etape 2: Première fonction pour Lecture et nettoyage de l'audio ------------
 
 def read_audio(conf, pathname, trim_long_data=True):
+
+    print(f"🍒​🍒​🍒​ {pathname} 🍒​🍒​🍒​")
+
     if "fma" not in pathname:
         y, sr = librosa.load(pathname,
                              sr=conf.sampling_rate,
@@ -54,6 +57,7 @@ def read_audio(conf, pathname, trim_long_data=True):
         return y
 
     else: ## quand l'extrait provient de FMA, il fait 30sec : on le split en 3x10sec y_1, y_2, y_3
+        print("🍒​1 split🍒​")
         y_1, sr_1 = librosa.load(pathname,
                                  sr=conf.sampling_rate,
                                  duration=conf.duration,
@@ -71,6 +75,7 @@ def read_audio(conf, pathname, trim_long_data=True):
             offset = padding // 2
             y_1 = np.pad(y_1, (offset, conf.samples - len(y_1) - offset), 'constant')
 
+        print("🍒​2 split🍒​")
         y_2, sr_1 = librosa.load(pathname,
                                  sr=conf.sampling_rate,
                                  duration=conf.duration,
@@ -88,6 +93,7 @@ def read_audio(conf, pathname, trim_long_data=True):
             offset = padding // 2
             y_2 = np.pad(y_2, (offset, conf.samples - len(y_2) - offset), 'constant')
 
+        print("🍒​3 split🍒​")
         y_3, sr_1 = librosa.load(pathname,
                                  sr=conf.sampling_rate,
                                  duration=conf.duration,
