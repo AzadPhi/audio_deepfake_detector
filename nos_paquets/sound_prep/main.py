@@ -29,19 +29,19 @@ def download_data_from_cloud(bucket_name, path_to_raw_data, data_size):
                                                      blob_names,
                                                      destination_directory=path_to_raw_data)
 
-    # tracks progress
-    completed_count = 0
-    for future in concurrent.futures.as_completed(results):
-        completed_count += 1
-        if completed_count % 1000 == 0 or completed_count == len(blob_names):
-            print(f"⭐​ {completed_count}/{len(blob_names)} files downloaded... ⭐​")
+    # # tracks progress
+    # completed_count = 0
+    # for future in concurrent.futures.as_completed(results):
+    #     completed_count += 1
+    #     if completed_count % 1000 == 0 or completed_count == len(blob_names):
+    #         print(f"⭐​ {completed_count}/{len(blob_names)} files downloaded... ⭐​")
 
 
     print("❤️​🩷​💛​💚​💙​ The data has been downloaded! ❤️​🩷​💛​💚​💙​")
 
     directory = Path(path_to_raw_data)
-    unwmanted_files = [".DS_Store", "checksums", "README.txt"]
-    files_path = [p for p in directory.rglob("*") if p.is_file() and p.name not in unwmanted_files]
+    wanted_files = (".mp3", ".wav")
+    files_path = [p for p in directory.rglob("*") if p.is_file() and p.name.lower().endswith(wanted_files)]
     string_paths = [str(path) for path in files_path]
 
     return string_paths
