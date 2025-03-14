@@ -25,3 +25,6 @@ INSTANCE = os.environ.get("INSTANCE")
 
 PATH_TO_RAW_DATA=f"/home/{os.environ.get('USER_NAME')}/audio_deepfake_detector/raw_data"
 PATH_PROCESSED_DATA=f"/home/{os.environ.get('USER_NAME')}/audio_deepfake_detector/processed_data/music_preprocessed_{DURATION}sec.csv"
+
+LOCAL_RAW_DATA = f"/Users/{os.environ.get('USER_NAME')}/code/{os.environ.get('GITHUB_NAME')}/audio_deepfake_detector/raw_data"
+LOCAL_PROCESSED_DATA = f"/Users/{os.environ.get('USER_NAME')}/Desktop/music_preprocessed_{DURATION}sec.csv"
