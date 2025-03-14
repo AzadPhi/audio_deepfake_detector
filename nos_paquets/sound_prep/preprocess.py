@@ -129,7 +129,14 @@ def audio_to_melspectrogram(conf, audio):
 ### ------------ Etape 4: Réunion des deux fonctions ------------
 
 def read_as_melspectrogram(conf, pathname, trim_long_data=False):
-    x = read_audio(conf, pathname, trim_long_data)
+
+    try:
+        x = read_audio(conf, pathname, trim_long_data)
+        print(f"🌷​ file processed: {pathname} 🌷​")
+
+    except:
+        print(f"⚠️ file ignored: {pathname} 💩​💩​")
+
 
     if type(x)==tuple: # dans le cas où x est un tuple (x1, x2, X3), cad quand le fichier audio provient de fma
         prep_results_arr_1 = audio_to_melspectrogram(conf, x[0])
@@ -174,7 +181,12 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
 
     data = []
 
+    count = 0
     for pathname in pathnames:
+
+        print(f"number of files processed: {count}")
+        count += 1
+
         music_id = pathname.split('/')[-1] # Extrait le nom de la musique
         folder_name = "/".join(pathname.split("/")[:-1]) # Extrait le lien / path
         prep_results_arr = read_as_melspectrogram(conf, pathname)  # retourne l'array du spec
