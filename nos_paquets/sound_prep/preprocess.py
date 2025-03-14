@@ -223,6 +223,6 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
     return df
 
 def create_csv(df):
-    df.to_csv(f"/home/{os.environ.get('USER_NAME')}/audio_deepfake_detector/processed_data/music_preprocessed.csv",
+    df.to_csv(PATH_PROCESSED_DATA,
               index=True)
     print('❤️​🩷​💛​💚​💙 all data saved as csv ❤️​🩷​💛​💚​💙​')
