@@ -6,7 +6,7 @@ import numpy as np
 #### CONSTANTS
 SAMPLING_RATE = 16000  # Fréquence d'échantillonnage (Hz) # on l'a fixé à 16000
 DURATION = 10  # Durée cible en secondes
-N_MELS = 128  # Nombre de bandes de Mel
+N_MELS = 128 # Nombre de bandes de Mel
 
 HOP_LENGTH = 347 * DURATION  # Détermine le nombre de frames temporelles
 FMIN = 20  # Fréquence minimale
