@@ -10,3 +10,7 @@ setup(name='audio_deepfake_detector',
       description="package permettant de transformer des sons en np array et plots",
        install_requires=requirements,
       packages=find_packages()) # You can have several packages, try it
+
+# setup(name='models_ml',
+#       descriprion = "models machine learning",
+#       packages= ['models_ml'])
