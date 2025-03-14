@@ -3,6 +3,7 @@ from nos_paquets.sound_prep.preprocess import *
 from pathlib import Path
 from google.cloud.storage import Client, transfer_manager
 import concurrent.futures
+import os
 
 
 def download_data_from_cloud(bucket_name, path_to_raw_data, data_size):
