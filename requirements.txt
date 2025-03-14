@@ -8,3 +8,4 @@ ipython
 pathlib
 setuptools
 matplotlib
+wheel
