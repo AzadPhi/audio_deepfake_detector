@@ -24,4 +24,5 @@ BUCKET_PROCESSED_DATA = os.environ.get("BUCKET_PROCESSED_DATA")
 INSTANCE = os.environ.get("INSTANCE")
 
 PATH_TO_RAW_DATA=os.environ.get('PATH_TO_RAW_DATA')
-PATH_PROCESSED_DATA=f"{os.environ.get('PATH_PROCESSED_DATA')}music_processed_{DURATION}sec.csv"
+# PATH_PROCESSED_DATA=f"{os.environ.get('PATH_PROCESSED_DATA')}music_processed_{DURATION}sec.csv"
+PATH_PROCESSED_DATA=os.environ.get('PATH_PROCESSED_DATA')

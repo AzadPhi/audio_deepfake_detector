@@ -7,6 +7,8 @@ import os
 import IPython.display as ipd
 import pandas as pd
 from nos_paquets.sound_prep.params import *
+from datetime import datetime
+
 
 ### ------------ Etape 1: Definition des paramètres ------------
 
@@ -185,8 +187,12 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
                 - une dernière colonne "is_generated" : 1 si la musique est générée / 0 si la musique n'est pas générée
     """
 
-    data = []
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_name = f"{PATH_PROCESSED_DATA}music_processed_{DURATION}_{timestamp}.csv"
 
+    data = []
+    df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+    df.to_csv(file_name, index=True)
     count = 0
     for pathname in pathnames:
 
@@ -206,6 +212,11 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
                 else:
                     is_generated=0
                 data.append([music_id, folder_name, array_flatten, arr_shape, is_generated])
+                df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+
+                df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
+                df.to_csv(file_name, index=False, mode='a', header=False)
+                data=[]
 
         else:
             arr_shape = prep_results_arr.shape # pour garder la shape de l'array
@@ -218,17 +229,22 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
                 is_generated=0
 
             data.append([music_id, folder_name, array_flatten, arr_shape, is_generated])
+            df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+            df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
+            df.to_csv(file_name, index=False, mode='a', header=False)
+            data=[]
 
 
-    df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
 
-    df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
+    # df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+
+    # df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
 
     print('❤️​🩷​💛​💚​💙​ all data converted to df ❤️​🩷​💛​💚​💙​')
 
     return df
 
 def create_csv(df):
-    df.to_csv(PATH_PROCESSED_DATA,
-              index=True)
+    file_name = f"{PATH_PROCESSED_DATA}_{DURATION}_{timestamp}.csv"
+    df.to_csv(file_name, index=True,mode='a')
     print('❤️​🩷​💛​💚​💙 all data saved as csv ❤️​🩷​💛​💚​💙​')
