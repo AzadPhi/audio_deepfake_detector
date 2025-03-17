@@ -33,7 +33,7 @@ TARGET = os.environ.get('TARGET_ENV', "local") # à modifier selon la data que l
 
 #--- LOCAL: target ='local'
 LOCAL_PATH_TO_RAW_DATA= os.environ.get('LOCAL_PATH_TO_RAW_DATA', 'code/NicoTerli/99-Perso/data_processed_1000.csv') #propore à chacun
-
+LOCAL_PATH_TO_RAW_DATA_PAU= os.environ.get('LOCAL_PATH_TO_RAW_DATA', 'code/AzadPhi/audio_deepfake_detector/data/1000_final.csv')
 #--- CheckPoint_Result
 LOCAL_PATH_SAVE_WEIGHT = os.environ.get('LOCAL_PATH_SAVE_WEIGHT', 'code/AzadPhi/audio_deepfake_detector/ModelCheckpoint/checkpoint.model.keras')
 CLOUD_PATH_SAVE_WEIGHT = os.environ.get('CLOUD_PATH_SAVE_WEIGHT', 'gs://checkpoint_result/checkpoint.model.keras' )
