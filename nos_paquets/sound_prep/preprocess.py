@@ -7,6 +7,8 @@ import os
 import IPython.display as ipd
 import pandas as pd
 from nos_paquets.sound_prep.params import *
+from datetime import datetime
+
 
 ### ------------ Etape 1: Definition des paramètres ------------
 
@@ -26,6 +28,9 @@ conf = Conf()
 ### ------------ Etape 2: Première fonction pour Lecture et nettoyage de l'audio ------------
 
 def read_audio(conf, pathname, trim_long_data=True):
+
+    print(f"🍒​🍒​🍒​ {pathname} 🍒​🍒​🍒​")
+
     if "fma" not in pathname:
         y, sr = librosa.load(pathname,
                              sr=conf.sampling_rate,
@@ -54,6 +59,7 @@ def read_audio(conf, pathname, trim_long_data=True):
         return y
 
     else: ## quand l'extrait provient de FMA, il fait 30sec : on le split en 3x10sec y_1, y_2, y_3
+        print("🍒​1 split🍒​")
         y_1, sr_1 = librosa.load(pathname,
                                  sr=conf.sampling_rate,
                                  duration=conf.duration,
@@ -71,6 +77,7 @@ def read_audio(conf, pathname, trim_long_data=True):
             offset = padding // 2
             y_1 = np.pad(y_1, (offset, conf.samples - len(y_1) - offset), 'constant')
 
+        print("🍒​2 split🍒​")
         y_2, sr_1 = librosa.load(pathname,
                                  sr=conf.sampling_rate,
                                  duration=conf.duration,
@@ -88,6 +95,7 @@ def read_audio(conf, pathname, trim_long_data=True):
             offset = padding // 2
             y_2 = np.pad(y_2, (offset, conf.samples - len(y_2) - offset), 'constant')
 
+        print("🍒​3 split🍒​")
         y_3, sr_1 = librosa.load(pathname,
                                  sr=conf.sampling_rate,
                                  duration=conf.duration,
@@ -129,7 +137,14 @@ def audio_to_melspectrogram(conf, audio):
 ### ------------ Etape 4: Réunion des deux fonctions ------------
 
 def read_as_melspectrogram(conf, pathname, trim_long_data=False):
-    x = read_audio(conf, pathname, trim_long_data)
+
+    try:
+        x = read_audio(conf, pathname, trim_long_data)
+        print(f"🌷​ file processed: {pathname} 🌷​")
+
+    except:
+        print(f"⚠️ file ignored: {pathname} 💩​💩​")
+
 
     if type(x)==tuple: # dans le cas où x est un tuple (x1, x2, X3), cad quand le fichier audio provient de fma
         prep_results_arr_1 = audio_to_melspectrogram(conf, x[0])
@@ -172,9 +187,18 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
                 - une dernière colonne "is_generated" : 1 si la musique est générée / 0 si la musique n'est pas générée
     """
 
-    data = []
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_name = f"{PATH_PROCESSED_DATA}music_processed_{DURATION}_{timestamp}.csv"
 
+    data = []
+    df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+    df.to_csv(file_name, index=True)
+    count = 0
     for pathname in pathnames:
+
+        print(f"number of files processed: {count}")
+        count += 1
+
         music_id = pathname.split('/')[-1] # Extrait le nom de la musique
         folder_name = "/".join(pathname.split("/")[:-1]) # Extrait le lien / path
         prep_results_arr = read_as_melspectrogram(conf, pathname)  # retourne l'array du spec
@@ -188,6 +212,11 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
                 else:
                     is_generated=0
                 data.append([music_id, folder_name, array_flatten, arr_shape, is_generated])
+                df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+
+                df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
+                df.to_csv(file_name, index=False, mode='a', header=False)
+                data=[]
 
         else:
             arr_shape = prep_results_arr.shape # pour garder la shape de l'array
@@ -200,17 +229,22 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
                 is_generated=0
 
             data.append([music_id, folder_name, array_flatten, arr_shape, is_generated])
+            df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+            df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
+            df.to_csv(file_name, index=False, mode='a', header=False)
+            data=[]
 
 
-    df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
 
-    df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
+    # df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+
+    # df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
 
     print('❤️​🩷​💛​💚​💙​ all data converted to df ❤️​🩷​💛​💚​💙​')
 
     return df
 
 def create_csv(df):
-    df.to_csv(f"/home/{os.environ.get('USER_NAME')}/audio_deepfake_detector/processed_data/music_preprocessed.csv",
-              index=True)
+    file_name = f"{PATH_PROCESSED_DATA}_{DURATION}_{timestamp}.csv"
+    df.to_csv(file_name, index=True,mode='a')
     print('❤️​🩷​💛​💚​💙 all data saved as csv ❤️​🩷​💛​💚​💙​')
