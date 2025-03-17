@@ -81,13 +81,13 @@ if __name__ == '__main__':
                                       batch_size=250,
                                       trim_long_data=False)
 
-    # print("🎉​ Second step done: now we will store the results into a csv 🤓​​")
+    print("🎉​ Second step done: now we will store the results into a csv 🤓​​")
 
-    #create_csv(df)
+    # create_csv(df)
 
-    # print("🚀​ And one last thing: we need to store the csv on gcloud 😎​")
+    print("🚀​ And one last thing: we need to store the csv on gcloud 😎​")
 
-    # upload_data_processed_on_gcloud(bucket_processed_data=BUCKET_PROCESSED_DATA,
-    #                                 csv_path=PATH_PROCESSED_DATA)
+    upload_data_processed_on_gcloud(bucket_processed_data=BUCKET_PROCESSED_DATA,
+                                    csv_path=PATH_PROCESSED_DATA)
 
     print("🎉​ THE END OF PREPROCESSING 🏁​🏁​🏁​🏁​​​")

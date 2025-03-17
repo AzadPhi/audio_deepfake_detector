@@ -6,13 +6,13 @@ import numpy as np
 
 #### CONSTANTS
 SAMPLING_RATE = 16000  # Fréquence d'échantillonnage (Hz) # on l'a fixé à 16000
-DURATION = 10  # Durée cible en secondes
+DURATION = 2  # Durée cible en secondes
 N_MELS = 128 # Nombre de bandes de Mel
 
-HOP_LENGTH = 347 * DURATION  # Détermine le nombre de frames temporelles
+N_FFT = N_MELS * 4  # Taille de la FFT (ou N_MELS * 8, mais plus lourd)
+HOP_LENGTH = N_FFT // 2 # Détermine le nombre de frames temporelles : plus c'est petit, plus c'est détaillé (j'ai hésité avec N_FFT // 4, plus lourd)
 FMIN = 20  # Fréquence minimale
-FMAX = SAMPLING_RATE // 2  # Fréquence maximale (Nyquist)
-N_FFT = N_MELS * 20  # Taille de la FFT
+FMAX = SAMPLING_RATE // 2  # Fréquence maximale
 SAMPLES = SAMPLING_RATE * DURATION
 
 #### VARIABLES
