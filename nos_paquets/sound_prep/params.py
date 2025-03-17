@@ -3,6 +3,7 @@
 import os
 import numpy as np
 
+
 #### CONSTANTS
 SAMPLING_RATE = 16000  # Fréquence d'échantillonnage (Hz) # on l'a fixé à 16000
 DURATION = 10  # Durée cible en secondes
@@ -23,5 +24,17 @@ BUCKET_PROCESSED_DATA = os.environ.get("BUCKET_PROCESSED_DATA")
 
 INSTANCE = os.environ.get("INSTANCE")
 
+#### PATHS & DATA
+
+TARGET = 'local' # à modifier selon la data que l'on vient prendre
+#--- GOOGLE CLOUD: target = 'gcloud'
 PATH_TO_RAW_DATA=f"/home/{os.environ.get('USER_NAME')}/audio_deepfake_detector/raw_data"
 PATH_PROCESSED_DATA=f"/home/{os.environ.get('USER_NAME')}/audio_deepfake_detector/processed_data/music_preprocessed_{DURATION}sec.csv"
+
+#--- LOCAL: target ='local'
+LOCAL_PATH_TO_RAW_DATA_NICOLEBELGE="/home/nicolast/code/NicoTerli/99-Perso/data_processed_1000 (1).csv"
+LOCAL_PATH_TO_RAW_DATA_PAUPAULABLONDEPLATINE=""
+
+#--- CheckPoint_Result
+LOCAL_PATH_SAVE_WEIGHT = "/home/nicolast/code/AzadPhi/audio_deepfake_detector/ModelCheckpoint/checkpoint.model.keras"
+CLOUD_PATH_SAVE_WEIGHT = "gs://checkpoint_result/checkpoint.model.keras"
