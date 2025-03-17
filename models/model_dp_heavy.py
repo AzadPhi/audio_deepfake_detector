@@ -18,6 +18,7 @@ from google.cloud import storage
 def load_data_heavy(csv_path):
 # Load dataset from a CSV file
     df = pd.read_csv(csv_path)
+    print("DATA LOADED")
     return df
 
 ### ------------ Etape 2: Reshape dataframe ------------
@@ -49,6 +50,7 @@ def reshape_spectrograms_heavy(df: pd.DataFrame, array_col="music_array", shape_
     df = df.iloc[valid_indices].copy()  # Filter out invalid rows (optional, if you want to remove them)
     df[array_col] = reshaped_arrays  # Replace the original column (music_array) with reshaped data
 
+    print("DATA RESHAPED")
     return df
 
 ### ------------ Etape 3: Définir les X et y ------------
@@ -127,6 +129,7 @@ def compile_model_cnn_heavy(model: models.Model, learning_rate=0.001):
         loss='binary_crossentropy', #For binary choix (0 or 1)
         metrics=['accuracy']
     )
+    print("MODEL COMPILED")
     return model
 
 ### ------------ Etape 6 : Test le modèle ------------
@@ -166,6 +169,8 @@ def train_model_cnn_heavy(
 
     if TARGET == 'gcloud': #to save the model in the g bucket if Target = cloud. Needs to be at the end as the model needs to be trained before saving
         upload_to_gcloud_heavy(checkpoint_path, "checkpoint_result", "checkpoint.model.keras")
+
+    print("MODEL TRAINED")
 
     return model, history.history
 

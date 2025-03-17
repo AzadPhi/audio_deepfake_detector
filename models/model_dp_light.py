@@ -20,6 +20,7 @@ from google.cloud import storage
 # Load dataset from a CSV file
 def load_data_light(csv_path):
     df = pd.read_csv(csv_path)
+    print("DATA LOADED")
     return df
 
 ### ------------ Etape 2: Reshape dataframe ------------
@@ -50,6 +51,8 @@ def reshape_spectrograms_light(df: pd.DataFrame, array_col="music_array", shape_
     # Keep only valid rows
     df = df.iloc[valid_indices].copy()
     df[array_col] = reshaped_arrays #Replace the original column (music_array) with reshaped data
+
+    print("DATA RESHAPED")
     return df
 
 ### ------------ Etape 3: Définir les X et y ------------
@@ -115,6 +118,7 @@ def compile_model_cnn_light(model: models.Model, learning_rate=0.05):
         loss='binary_crossentropy', #For binary choix (0 or 1)
         metrics=['accuracy']
     )
+    print("MODEL COMPILED")
     return model
 
 ### ------------ Etape 6 : Test le modèle ------------
@@ -154,6 +158,8 @@ def train_model_cnn_light(
 
     if TARGET == 'gcloud': #to save the model in the g bucket if Target = cloud. Needs to be at the end as the model needs to be trained before saving
         upload_to_gcloud_light(checkpoint_path, "checkpoint_result", "checkpoint.model.keras")
+
+    print("MODEL TRAINED")
 
     return model, history.history
 ### ------------ Etape 6.1 : Évaluer le modèle sur les données de test ------------

@@ -23,6 +23,8 @@ if __name__ == "__main__":
             csv_path = PATH_PROCESSED_DATA
         df = load_data_heavy(csv_path) ## Load the data
 
+        print("DATA WILL BE RESHAPED")
+
         if df is not None:
             df_reshaped = reshape_spectrograms_heavy(df, array_col="music_array", shape_col="shape_arr")
 
