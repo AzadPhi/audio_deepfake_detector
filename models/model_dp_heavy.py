@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
-import librosa
 import librosa.display
 import tensorflow as tf
-import keras
 import IPython.display as ipd
 import ast
 import os
@@ -25,21 +23,32 @@ def load_data_heavy(csv_path):
 ### ------------ Etape 2: Reshape dataframe ------------
 
 def reshape_spectrograms_heavy(df: pd.DataFrame, array_col="music_array", shape_col="shape_arr"):
-# Transform the music array value into a Tuple so that it can be read by the Model
-    reshaped_arrays = [] #to store reshaped spectrograms
+    # Transform the music array value into a Tuple so that it can be read by the Model
+    reshaped_arrays = []  # To store reshaped spectrograms
+    valid_indices = []  # Track valid indices for potential filtering
 
     for i in range(len(df)):
         try:
-            array_values = np.array(ast.literal_eval(df.iloc[i][array_col])) #Read the spectrogram from music_array, converts the string into a Python list, transforms it into a NumPy array
+            value = df.iloc[i][array_col]
+            shape_value = df.iloc[i][shape_col]
 
-            original_shape = ast.literal_eval(df.iloc[i][shape_col]) # Read the original shape of the spectrogram and convert to a Tuple
-            reshaped_array = array_values.reshape(original_shape) # Reshape the spectrogram to its correct shape
-            reshaped_arrays.append(reshaped_array) # Store the reshaped spectrogram in a list
+            # Ensure proper conversion
+            if isinstance(value, str):
+                array_values = np.array(ast.literal_eval(value))  # Convert string to list, then NumPy array
+            else:
+                array_values = np.array(value)
+
+            original_shape = ast.literal_eval(shape_value) if isinstance(shape_value, str) else shape_value  # Ensure tuple format
+            reshaped_array = array_values.reshape(original_shape)  # Reshape to its correct shape
+            reshaped_arrays.append(reshaped_array)  # Store the reshaped spectrogram
+            valid_indices.append(i)
+
         except Exception as e:
-            print(f"Error processing row {i}: {e}") # If an error occurs, print the issue
-            reshaped_arrays.append(None)
+            print(f"Error processing row {i}: {e}")  # If an error occurs, print the issue
 
-    df[array_col] = reshaped_arrays #Replace the original column (music_array) with reshaped data
+    df = df.iloc[valid_indices].copy()  # Filter out invalid rows (optional, if you want to remove them)
+    df[array_col] = reshaped_arrays  # Replace the original column (music_array) with reshaped data
+
     return df
 
 ### ------------ Etape 3: Définir les X et y ------------
@@ -95,7 +104,7 @@ def model_cnn_heavy(input_shape, use_global_pooling=True):
     model.add(MaxPooling2D((2,2)))
 
     if use_global_pooling:
-        model.add(GlobalAveragePooling2D())
+        model.add(GlobalAveragePooling2D())  #Reduces size by taking the max value in 2x2 regions (apparently good for CNN)
     else:
         model.add(Flatten())
 
@@ -131,7 +140,7 @@ def train_model_cnn_heavy(
         validation_split=0.3, # Percentage of training data for validation
     ):
 
-    if TARGET == 'local': #checkpoint to save the weight (if local, then local file, if not, then in Google bucket)
+    if TARGET == TARGET: #checkpoint to save the weight (if local, then local file, if not, then in Google bucket)
         checkpoint_path = LOCAL_PATH_SAVE_WEIGHT
     else:
         checkpoint_path = checkpoint.model.keras
@@ -165,7 +174,7 @@ def train_model_cnn_heavy(
 def evaluate_model_heavy(model, X_test, y_test):
     test_loss, test_acc = model.evaluate(X_test, y_test, verbose=2)
 
-    print(f"💢💢 Loss : {test_loss:.4f} 💢💢")
+    print(f"💢💢 Loss : {test_loss:.4%} 💢💢")
     print(f"✅​✅​ Accuracy : {test_acc:.4%}✅​✅​")
 
     return test_loss, test_acc
@@ -190,7 +199,7 @@ def upload_to_gcloud_heavy(local_model_path, bucket_name, destination_blob_name)
 ### ------------ Etape 8: Execution ------------
 if __name__ == "__main__":
     if TARGET == 'local':  # Fix the comparison operator
-        csv_path = LOCAL_PATH_TO_RAW_DATA_NICOLEBELGE  # Use the correct variable depending on the environment
+        csv_path = LOCAL_PATH_TO_RAW_DATA  # Use the correct variable depending on the environment
     else:
         csv_path = PATH_PROCESSED_DATA
     df = load_data_heavy(csv_path) ## Load the data
