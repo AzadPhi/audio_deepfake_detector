@@ -1,6 +1,6 @@
 .env
 
-nohup.out
+*nohup.out
 
 # OS generated files #
 ######################
