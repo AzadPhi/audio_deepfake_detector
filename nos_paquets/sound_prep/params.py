@@ -20,8 +20,23 @@ DATA_SIZE = os.environ.get("DATA_SIZE")
 GCP_PROJECT = os.environ.get("GCP_PROJECT")
 BUCKET_NAME_RAW_DATA = os.environ.get("BUCKET_NAME_RAW_DATA")
 BUCKET_PROCESSED_DATA = os.environ.get("BUCKET_PROCESSED_DATA")
-
 INSTANCE = os.environ.get("INSTANCE")
 
-PATH_TO_RAW_DATA=os.environ.get('PATH_TO_RAW_DATA')
-PATH_PROCESSED_DATA=os.environ.get('PATH_PROCESSED_DATA')
+PATH_TO_RAW_DATA=os.environ.get('PATH_TO_RAW_DATA', "audio_deepfake_detector/raw_data")
+PATH_PROCESSED_DATA = os.path.join(
+    os.environ.get("PATH_PROCESSED_DATA", "audio_deepfake_detector/processed_data"),
+    f"music_preprocessed_{DURATION}sec.csv"
+)
+
+#### PATHS & DATA
+TARGET = os.environ.get('TARGET_ENV', "local") # à modifier selon la data que l'on vient prendre
+
+#--- LOCAL: target ='local'
+LOCAL_PATH_TO_RAW_DATA= os.environ.get('LOCAL_PATH_TO_RAW_DATA', 'code/NicoTerli/99-Perso/data_processed_1000.csv') #propore à chacun
+
+#--- CheckPoint_Result
+LOCAL_PATH_SAVE_WEIGHT = os.environ.get('LOCAL_PATH_SAVE_WEIGHT', 'code/AzadPhi/audio_deepfake_detector/ModelCheckpoint/checkpoint.model.keras')
+CLOUD_PATH_SAVE_WEIGHT = os.environ.get('CLOUD_PATH_SAVE_WEIGHT', 'gs://checkpoint_result/checkpoint.model.keras' )
+
+#---Model
+MODEL = os.environ.get("MODEL")
