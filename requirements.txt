@@ -17,3 +17,11 @@ uvicorn         # web server
 # tests
 httpx           # HTTP client
 pytest-asyncio  # asynchronous I/O support for pytest
+
+# Machine Learning & Deep Learning
+tensorflow
+keras
+scikit-learn
+
+# Cloud Storage
+google-cloud-storage

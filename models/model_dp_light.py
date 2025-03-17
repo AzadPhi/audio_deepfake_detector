@@ -68,13 +68,12 @@ def preprocess_data_light(df: pd.DataFrame):
     return X_train, X_test, y_train, y_test
 
 ### ------------ Etape 4: 1er Modèle CNN léger ------------
-
 def model_cnn_light(input_shape, use_global_pooling=True):
     model = models.Sequential()
 
     model.add(Conv2D(16, (3,3), padding='same', input_shape=input_shape)) # Number of filters in the layer + Size of each filter
     model.add(BatchNormalization()) ## Rend le modèle plus rapide
-    model.add(Activation('relu')) ## Activation recommandé
+    model.add(Activation('relu')) ## Activation recommandée
     model.add(MaxPooling2D((2,2)))
 
     model.add(Conv2D(32, (3,3), padding='same'))
@@ -93,7 +92,7 @@ def model_cnn_light(input_shape, use_global_pooling=True):
     model.add(MaxPooling2D((2,2)))
 
     if use_global_pooling:
-        model.add(GlobalAveragePooling2D()) # Reduces size by taking the max value in 2x2 regions
+        model.add(GlobalAveragePooling2D()) # Reduces size by taking the max value in 2x2 regions (apparently good for CNN)
     else:
         model.add(Flatten())
 
@@ -132,7 +131,7 @@ def train_model_cnn_light(
     if TARGET == 'local': #checkpoint to save the weight (if local, then local file, if not, then in Google bucket)
         checkpoint_path = LOCAL_PATH_SAVE_WEIGHT
     else:
-        checkpoint_path = checkpoint.model.keras
+        checkpoint_path = CLOUD_PATH_SAVE_WEIGHT
 
     early_stopping = EarlyStopping(monitor="val_loss", patience = 5 ,restore_best_weights=True) #stop training if val_loss doesn't improve, but goes anyway until 5 epochs (patience)
 
@@ -157,12 +156,11 @@ def train_model_cnn_light(
         upload_to_gcloud_light(checkpoint_path, "checkpoint_result", "checkpoint.model.keras")
 
     return model, history.history
-
 ### ------------ Etape 6.1 : Évaluer le modèle sur les données de test ------------
 def evaluate_model_light(model, X_test, y_test):
     test_loss, test_acc = model.evaluate(X_test, y_test, verbose=2)
 
-    print(f"💢💢 Loss : {test_loss:.4f} 💢💢")
+    print(f"💢💢 Loss : {test_loss:.4%} 💢💢")
     print(f"✅​✅​ Accuracy : {test_acc:.4%} ✅​✅​")
 
     return test_loss, test_acc
@@ -183,11 +181,10 @@ def upload_to_gcloud_light(local_model_path, bucket_name, destination_blob_name)
     blob.upload_from_filename(local_model_path)
     print(f"Upload complete - file saved at: gs://{bucket_name}/{destination_blob_name}")
 
-
 ### ------------ Etape 8 : Execution ------------
 if __name__ == "__main__":
     if TARGET == 'local':
-        csv_path = LOCAL_PATH_TO_RAW_DATA_NICOLEBELGE
+        csv_path = LOCAL_PATH_TO_RAW_DATA
     else:
         csv_path = PATH_PROCESSED_DATA
     df = load_data_light(csv_path)
