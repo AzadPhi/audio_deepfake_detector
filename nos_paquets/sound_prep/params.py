@@ -15,7 +15,6 @@ FMAX = SAMPLING_RATE // 2  # Fréquence maximale (Nyquist)
 N_FFT = N_MELS * 20  # Taille de la FFT
 SAMPLES = SAMPLING_RATE * DURATION
 
-
 #### VARIABLES
 DATA_SIZE = os.environ.get("DATA_SIZE")
 GCP_PROJECT = os.environ.get("GCP_PROJECT")

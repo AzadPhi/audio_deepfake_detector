@@ -1,4 +1,3 @@
-
 import librosa
 import librosa.display
 import numpy as np
@@ -27,98 +26,83 @@ conf = Conf()
 
 ### ------------ Etape 2: Première fonction pour Lecture et nettoyage de l'audio ------------
 
-def read_audio(conf, pathname, trim_long_data=True):
+def process_audio(conf, pathname, offset=0.0, trim_long_data=True):
+    """
+    Cette fonction lit les fichiers audios et les retourne sous forme de np array
+    params:
+            - conf : avec sampling_rate, duration et samples définis dans params.py
+            - pathname : string
+            - offset: par défaut à 0, mais il faut le décaler de 10 sec pour les fichiers FMA
+            - trim_long_data : bool, si True, coupe les audios trop longs
+    returns:
+            - y : np.array (signal audio traité)
+    """
 
-    print(f"🍒​🍒​🍒​ {pathname} 🍒​🍒​🍒​")
+    try:
+        y, sr = librosa.load(pathname,
+                                sr=conf.sampling_rate,
+                                duration=conf.duration,
+                                offset=offset,
+                                mono=True)
+    except Exception as e:
+        print(f"🔕​ Ignoring {pathname}: {e} 💩​")
+        return None
+
+    if 0 < len(y): # Évite une erreur en cas de fichier audio vide
+        y, _ = librosa.effects.trim(y) # Supprime les silences au début et à la fin
+
+    # Si l'audio est plus long que la durée cible, on coupe l'excédent.
+    # Si l'audio est trop court, on ajoute du padding (remplissage avec des zéros) des deux côtés pour uniformiser la taille.
+
+    if len(y) > conf.samples: # Si l'audio est trop long
+        if trim_long_data:
+            y = y[0:0+conf.samples] # On garde seulement la partie nécessaire
+
+    elif len(y) < conf.samples: # Si l'audio est trop court, on ajoute du padding
+        padding = conf.samples - len(y)    # Nombre d'échantillons à ajouter
+        offset = padding // 2 # Ajout équilibré à gauche et à droite
+        y = np.pad(y, (offset, conf.samples - len(y) - offset), 'constant')
+
+    return y
+
+def read_audio(conf, pathname, trim_long_data=True):
+    """
+    Cette fonction lit les fichiers audios et les retourne sous forme de np array
+
+    params:
+            - conf : avec sampling_rate, duration et samples définis dans params.py
+            - pathname : string
+            - trim_long_data : bool, si True, coupe les audios trop longs
+    returns:
+            - y : np.array SI LE FICHIER NE VIENT PAS DE FMA
+            - (y1, y2, y3) tuple de np.array si le fichier vient de FMA
+    """
+    print(f"🎶​🎶​ Lecture de​ {pathname} 🎶​🎶​​")
 
     if "fma" not in pathname:
-        y, sr = librosa.load(pathname,
-                             sr=conf.sampling_rate,
-                             duration=conf.duration,
-                             mono=True)
-        # Charge le fichier audio pathname avec une fréquence d'échantillonnage définie dans conf.sampling_rate (44100 Hz dans ce cas)
-        # y est le signal audio sous forme d'un tableau NumPy
-        # sr est la fréquence d'échantillonnage
+        return process_audio(conf, pathname, trim_long_data=trim_long_data)
 
-        if 0 < len(y): # Évite une erreur en cas de fichier audio vide
-            y, _ = librosa.effects.trim(y) # Supprime les silences au début et à la fin
-        # La fonction librosa.effects.trim(y) supprime les parties silencieuses en début et fin d'audio
+    else:
+        print("🔔​🔔​ audio file from FMA: splitting it in three parts")
+        y_1, y_2, y_3 = tuple(process_audio(conf, pathname, offset=i*10.0, trim_long_data=trim_long_data) for i in range(3))
+        return y_1, y_2, y_3
 
-        # Si l'audio est plus long que la durée cible, on coupe l'excédent.
-        # Si l'audio est trop court, on ajoute du padding (remplissage avec des zéros) des deux côtés pour uniformiser la taille.
-
-        if len(y) > conf.samples: # Si l'audio est trop long
-            if trim_long_data:
-                y = y[0:0+conf.samples] # On garde seulement la partie nécessaire
-
-        else: # Si l'audio est trop court, on ajoute du padding
-            padding = conf.samples - len(y)    # Nombre d'échantillons à ajouter
-            offset = padding // 2 # Ajout équilibré à gauche et à droite
-            y = np.pad(y, (offset, conf.samples - len(y) - offset), 'constant')
-
-        return y
-
-    else: ## quand l'extrait provient de FMA, il fait 30sec : on le split en 3x10sec y_1, y_2, y_3
-        print("🍒​1 split🍒​")
-        y_1, sr_1 = librosa.load(pathname,
-                                 sr=conf.sampling_rate,
-                                 duration=conf.duration,
-                                 mono=True,
-                                 offset=0.0)
-        if 0 < len(y_1): # Évite une erreur en cas de fichier audio vide
-            y_1, _ = librosa.effects.trim(y_1)
-
-        if len(y_1) > conf.samples: # Si l'audio est trop long
-            if trim_long_data:
-                y_1 = y_1[0:0+conf.samples]
-
-        else: # Si l'audio est trop court, on ajoute du padding
-            padding = conf.samples - len(y_1)
-            offset = padding // 2
-            y_1 = np.pad(y_1, (offset, conf.samples - len(y_1) - offset), 'constant')
-
-        print("🍒​2 split🍒​")
-        y_2, sr_1 = librosa.load(pathname,
-                                 sr=conf.sampling_rate,
-                                 duration=conf.duration,
-                                 mono=True,
-                                 offset=10.0)
-        if 0 < len(y_2): # Évite une erreur en cas de fichier audio vide
-            y_2, _ = librosa.effects.trim(y_2)
-
-        if len(y_2) > conf.samples: # Si l'audio est trop long
-            if trim_long_data:
-                y_2 = y_2[0:0+conf.samples]
-
-        else: # Si l'audio est trop court, on ajoute du padding
-            padding = conf.samples - len(y_2)
-            offset = padding // 2
-            y_2 = np.pad(y_2, (offset, conf.samples - len(y_2) - offset), 'constant')
-
-        print("🍒​3 split🍒​")
-        y_3, sr_1 = librosa.load(pathname,
-                                 sr=conf.sampling_rate,
-                                 duration=conf.duration,
-                                 mono=True,
-                                 offset=20.0)
-        if 0 < len(y_3): # Évite une erreur en cas de fichier audio vide
-            y_3, _ = librosa.effects.trim(y_3)
-
-        if len(y_3) > conf.samples: # Si l'audio est trop long
-            if trim_long_data:
-                y_3 = y_3[0:0+conf.samples]
-
-        else: # Si l'audio est trop court, on ajoute du padding
-            padding = conf.samples - len(y_3)
-            offset = padding // 2
-            y_3 = np.pad(y_3, (offset, conf.samples - len(y_3) - offset), 'constant')
-
-        return (y_1, y_2, y_3)
 
 
 ### ------------ Etape 3: Conversion en spectrogramme ------------
 
 def audio_to_melspectrogram(conf, audio):
+
+    """
+    Cette fonction convertit un signal audio en mel-spectrogramme.
+
+    Params :
+        - conf (params.py)
+        - audio: signal audio sous forme de np.array
+
+    Returns: spectrogramme sous forme de np.array
+    """
+
     spectrogram = librosa.feature.melspectrogram(audio,
                                                  sr=conf.sampling_rate,
                                                  n_mels=conf.n_mels,
@@ -126,13 +110,9 @@ def audio_to_melspectrogram(conf, audio):
                                                  n_fft=conf.n_fft,
                                                  fmin=conf.fmin,
                                                  fmax=conf.fmax)
-    spectrogram = librosa.power_to_db(spectrogram)
-    spectrogram = spectrogram.astype(np.float32)
+    spectrogram = librosa.power_to_db(spectrogram) # conversion en dB (plus représentatif de la perception humaine du son
+    spectrogram = spectrogram.astype(np.float32) # to save memory
     return spectrogram    # type(spectrogram)=numpy.ndarray
-
-    # Cette fonction génère un mel-spectrogram (une version transformée du spectrogramme classique) dans un premier temps
-    # Puis conversion en dB (plus représentatif de la perception humaine du son)
-    # Enfin, conversion en float32 pour optimiser la mémoire et la compatibilité
 
 ### ------------ Etape 4: Réunion des deux fonctions ------------
 
@@ -144,6 +124,10 @@ def read_as_melspectrogram(conf, pathname, trim_long_data=False):
 
     except:
         print(f"⚠️ file ignored: {pathname} 💩​💩​")
+
+    if x is None:
+        print(f"⚠️ Error reading file: {pathname}")
+        return None
 
 
     if type(x)==tuple: # dans le cas où x est un tuple (x1, x2, X3), cad quand le fichier audio provient de fma
@@ -158,7 +142,6 @@ def read_as_melspectrogram(conf, pathname, trim_long_data=False):
         return prep_results_arr # type(spectrogram)=numpy.ndarray
 
 # -> la fonction permet d'obtenir des np array
-# exemple array_test = read_as_melspectrogram(conf,music_1_path,trim_long_data=False)
 
 ### ------------ Etape 5 (OPTIONNEL): Fonction pour plotter notre résultat ressorti par l'étape 4 ------------
 
@@ -176,34 +159,39 @@ def plot_spectrogram(Y, sr, hop_length, y_axis="linear"):
 
 ### ------------ Etape 6 : Convertit le np array et l'ajoute à un Dataframe ------------
 
-def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
+def create_spectrogram_dataframe(conf, pathnames : list, batch_size, trim_long_data=False):
 
-    """cette fonction prend en entrée la liste des paths des fichiers audio et rend un dataframe:
+    """cette fonction prend en entrée la liste des paths des fichiers audio et rend un dataframe storé sous format .csv:
     le dataframe contient :
                 - l'id de la musique (plusieurs musique ont peut-être la même id, notamment dans le cas de fma),
                 - le nom du folder et des sous-folders dans lesquels le son est storé,
                 - l'array FLATTENED du spectrogramme,
                 - la shape d'origine du spectrogramme pour pouvoir reshaper l'array avant de l'entrer dans les modèles,
                 - une dernière colonne "is_generated" : 1 si la musique est générée / 0 si la musique n'est pas générée
+
+    le paramètre batch_size permet de gérer le cas où les fichiers sont trop nombreux
     """
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_name = f"{PATH_PROCESSED_DATA}music_processed_{DURATION}_{timestamp}.csv"
+    file_name = f"{PATH_PROCESSED_DATA}/music_processed_{DURATION}_{timestamp}.csv"
 
-    data = []
+    data = [] # liste pour storer temporairement les lignes du df
     df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
-    df.to_csv(file_name, index=True)
-    count = 0
-    for pathname in pathnames:
+    df.to_csv(file_name, index=True) # fichier csv vide, avec les headers
 
-        print(f"number of files processed: {count}")
-        count += 1
+
+    for count, pathname in enumerate(pathnames, start=1):
+        print(f"Processign file : {count} / {len(pathnames)}")
 
         music_id = pathname.split('/')[-1] # Extrait le nom de la musique
         folder_name = "/".join(pathname.split("/")[:-1]) # Extrait le lien / path
         prep_results_arr = read_as_melspectrogram(conf, pathname)  # retourne l'array du spec
 
-        if type(prep_results_arr)==tuple: # si c'est un tuple, il faut faire 3 fois :
+        # if prep_results_arr is None:
+        #     print(f"⚠️ Skipping file due to error: {pathname}")
+        #     continue
+
+        if isinstance(prep_results_arr, tuple): # si c'est un tuple, il faut faire 3 fois :
             for i in range(3):
                 arr_shape = prep_results_arr[i].shape
                 array_flatten = prep_results_arr[i].flatten()
@@ -212,39 +200,31 @@ def create_spectrogram_dataframe(conf, pathnames : list, trim_long_data=False):
                 else:
                     is_generated=0
                 data.append([music_id, folder_name, array_flatten, arr_shape, is_generated])
-                df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
-
-                df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
-                df.to_csv(file_name, index=False, mode='a', header=False)
-                data=[]
 
         else:
             arr_shape = prep_results_arr.shape # pour garder la shape de l'array
             array_flatten = prep_results_arr.flatten() # on flatten l'array
-
             if "fake" in folder_name.lower():
                 is_generated=1
-
             else:
                 is_generated=0
-
             data.append([music_id, folder_name, array_flatten, arr_shape, is_generated])
-            df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
-            df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
-            df.to_csv(file_name, index=False, mode='a', header=False)
-            data=[]
 
 
+        # when batchsize is reached, we store the list in the df and the df in the csv
+        if len(data) >= batch_size:
+            print(f"{batch_size} files have been processed, writing the results in the csv.")
+            df_batch = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+            df_batch["music_array"] = df_batch["music_array"].apply(lambda x: x.tolist())
+            df_batch.to_csv(file_name, index=True, mode='a', header=False)
+            data = []
 
-    # df = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+    if data:
+        print("Writing the remaining data to the .csv")
+        df_batch = pd.DataFrame(data, columns=["music_id", "folder_name", "music_array", "shape_arr", "is_generated"])
+        df_batch["music_array"] = df_batch["music_array"].apply(lambda x: x.tolist())
+        df_batch.to_csv(file_name, index=True, mode='a', header=False)
 
-    # df["music_array"] = df["music_array"].apply(lambda x: x.tolist())
+    print('❤️​🩷​💛​💚​💙​ all data converted to df and stored as .csv ❤️​🩷​💛​💚​💙​')
 
-    print('❤️​🩷​💛​💚​💙​ all data converted to df ❤️​🩷​💛​💚​💙​')
-
-    return df
-
-def create_csv(df):
-    file_name = f"{PATH_PROCESSED_DATA}_{DURATION}_{timestamp}.csv"
-    df.to_csv(file_name, index=True,mode='a')
-    print('❤️​🩷​💛​💚​💙 all data saved as csv ❤️​🩷​💛​💚​💙​')
+    return pd.read_csv(file_name)

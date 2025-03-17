@@ -6,7 +6,7 @@ import concurrent.futures
 import os
 
 
-def download_data_from_cloud(bucket_name, path_to_raw_data, data_size):
+def download_data_from_cloud(bucket_name, raw_data_directory, data_size):
     """this function download the data stored on a bucket on gcloud, it stores is in the chosen directory
     if data_size=all, it downloads all the data"""
 
@@ -28,24 +28,26 @@ def download_data_from_cloud(bucket_name, path_to_raw_data, data_size):
     # starts downloading
     results = transfer_manager.download_many_to_path(bucket,
                                                      blob_names,
-                                                     destination_directory=path_to_raw_data)
-
-    # # tracks progress
-    # completed_count = 0
-    # for future in concurrent.futures.as_completed(results):
-    #     completed_count += 1
-    #     if completed_count % 1000 == 0 or completed_count == len(blob_names):
-    #         print(f"⭐​ {completed_count}/{len(blob_names)} files downloaded... ⭐​")
-
+                                                     destination_directory=raw_data_directory)
 
     print("❤️​🩷​💛​💚​💙​ The data has been downloaded! ❤️​🩷​💛​💚​💙​")
 
-    directory = Path(path_to_raw_data)
-    wanted_files = (".mp3", ".wav")
-    files_path = [p for p in directory.rglob("*") if p.is_file() and p.name.lower().endswith(wanted_files)]
-    string_paths = [str(path) for path in files_path]
 
-    return string_paths
+def get_paths_as_list(raw_data_directory):
+    """
+    cette fonction permet de récupérer une liste contenant tous les noms des fichiers audio sous forme de liste de strings
+    """
+    files_path = []
+    for dirpath, _, filenames in os.walk(raw_data_directory):
+        for filename in filenames:
+            file_path = os.path.join(dirpath, filename)
+            if os.path.getsize(file_path) >= 400000:
+                files_path.append(file_path)
+
+    wanted_files = (".mp3", ".wav")
+    files_path = [p for p in files_path if p.lower().endswith(wanted_files)] # pour exclure les fichiers non audio
+
+    return files_path
 
 def upload_data_processed_on_gcloud(bucket_processed_data,
                                     csv_path):
@@ -66,21 +68,26 @@ def upload_data_processed_on_gcloud(bucket_processed_data,
 
 if __name__ == '__main__':
 
-    string_paths = download_data_from_cloud(bucket_name=BUCKET_NAME_RAW_DATA,
-                                            path_to_raw_data=PATH_TO_RAW_DATA,
-                                            data_size=DATA_SIZE)
+    # download_data_from_cloud(bucket_name=BUCKET_NAME_RAW_DATA,
+    #                          raw_data_directory=PATH_TO_RAW_DATA,
+    #                          data_size=DATA_SIZE)
+
+    paths_to_audio_files = get_paths_as_list(PATH_TO_RAW_DATA)
 
     print("🎉​ First step done: now we will convert the audiofiles into mel-spectrogram 🤓​")
 
-    df = create_spectrogram_dataframe(conf, string_paths, trim_long_data=False)
+    df = create_spectrogram_dataframe(conf,
+                                      paths_to_audio_files,
+                                      batch_size=250,
+                                      trim_long_data=False)
 
-    print("🎉​ Second step done: now we will store the results into a csv 🤓​​")
+    # print("🎉​ Second step done: now we will store the results into a csv 🤓​​")
 
     #create_csv(df)
 
-    print("🚀​ And one last thing: we need to store the csv on gcloud 😎​")
+    # print("🚀​ And one last thing: we need to store the csv on gcloud 😎​")
 
     # upload_data_processed_on_gcloud(bucket_processed_data=BUCKET_PROCESSED_DATA,
-                                    #csv_path=PATH_PROCESSED_DATA)
+    #                                 csv_path=PATH_PROCESSED_DATA)
 
     print("🎉​ THE END OF PREPROCESSING 🏁​🏁​🏁​🏁​​​")
