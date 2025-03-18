@@ -26,6 +26,7 @@ if __name__ == "__main__":
             csv_path = LOCAL_PATH_TO_RAW_DATA  # Use the correct variable depending on the environment
         else:
             csv_path = PATH_PROCESSED_DATA
+        print(csv_path)
         df = load_data(csv_path) ## Load the data
 
         print("DATA WILL BE RESHAPED")

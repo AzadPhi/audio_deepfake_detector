@@ -18,6 +18,7 @@ from nos_paquets.sound_prep.params import *
 from models.models_ml.models_ml import *
 
 def load_data(csv_path):
+    print(type(csv_path))
     df = pd.read_csv(csv_path)
     print("🔥​🔥​ DATA LOADED 🔥​🔥​")
     return df
