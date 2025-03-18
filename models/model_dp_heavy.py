@@ -7,7 +7,7 @@ import ast
 import os
 from sklearn.model_selection import train_test_split
 from tensorflow.keras import models
-from tensorflow.keras.layers import (Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization, GlobalAveragePooling2D)
+from tensorflow.keras.layers import (Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization, GlobalAveragePooling2D, SpatialDropout2D)
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from typing import Tuple
 from nos_paquets.sound_prep.params import *
@@ -70,37 +70,35 @@ from google.cloud import storage
 
 ### ------------ Etape 4: 1er Modèle CNN léger ------------
 # CNN Model
-
 def model_cnn_heavy(input_shape, use_global_pooling=True):
-    model = models.Sequential()
 
+    model = models.Sequential()
     model.add(Conv2D(16, (3,3), padding='same', input_shape=input_shape))
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.4))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D((2,2)))
 
     model.add(Conv2D(32, (3,3), padding='same'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.4))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D((2,2)))
 
     model.add(Conv2D(64, (3,3), padding='same'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.4))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D((2,2)))
 
     model.add(Conv2D(128, (3,3), padding='same'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.4))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D((2,2)))
 
-
     model.add(Conv2D(256, (3,3), padding='same'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.4))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D((2,2)))
@@ -111,10 +109,9 @@ def model_cnn_heavy(input_shape, use_global_pooling=True):
         model.add(Flatten())
 
     model.add(Dense(512))
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.4))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-
     model.add(Dense(1, activation='sigmoid'))
 
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
