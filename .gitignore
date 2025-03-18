@@ -1,6 +1,7 @@
 .env
 
 *nohup.out
+*.out
 
 # OS generated files #
 ######################
@@ -10,6 +11,7 @@ __MACOSX
 # Jupiter Notebook #
 .pytest_cache
 __pycache__
+*__pycache__*
 *checkpoint.ipynb
 *.ipynb_checkpoints
 notebooks/
@@ -34,3 +36,4 @@ mlruns
 
 # data folders
 raw_data/
+*code/A*

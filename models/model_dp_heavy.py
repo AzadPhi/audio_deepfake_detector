@@ -10,63 +10,70 @@ from tensorflow.keras import models
 from tensorflow.keras.layers import (Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization, GlobalAveragePooling2D)
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from typing import Tuple
-from nos_paquets.sound_prep.params import *
 from google.cloud import storage
 
+from nos_paquets.sound_prep.params import *
+#from models.reshaping import *
+from models.reshaping import load_data, reshape_spectrograms
 
-### ------------ Etape 1: Récuperer le CSV ------------
-def load_data_heavy(csv_path):
-# Load dataset from a CSV file
-    df = pd.read_csv(csv_path)
-    print("DATA LOADED")
-    return df
 
-### ------------ Etape 2: Reshape dataframe ------------
 
-def reshape_spectrograms_heavy(df: pd.DataFrame, array_col="music_array", shape_col="shape_arr"):
-    # Transform the music array value into a Tuple so that it can be read by the Model
-    reshaped_arrays = []  # To store reshaped spectrograms
-    valid_indices = []  # Track valid indices for potential filtering
 
-    for i in range(len(df)):
-        try:
-            value = df.iloc[i][array_col]
-            shape_value = df.iloc[i][shape_col]
+# ### ------------ Etape 1: Récuperer le CSV ------------
+# def load_data_heavy(csv_path):
+# # Load dataset from a CSV file
+#     df = pd.read_csv(csv_path)
+#     print("DATA LOADED")
+#     return df
 
-            # Ensure proper conversion
-            if isinstance(value, str):
-                array_values = np.array(ast.literal_eval(value))  # Convert string to list, then NumPy array
-            else:
-                array_values = np.array(value)
+# ### ------------ Etape 2: Reshape dataframe ------------
 
-            original_shape = ast.literal_eval(shape_value) if isinstance(shape_value, str) else shape_value  # Ensure tuple format
-            reshaped_array = array_values.reshape(original_shape)  # Reshape to its correct shape
-            reshaped_arrays.append(reshaped_array)  # Store the reshaped spectrogram
-            valid_indices.append(i)
+# def reshape_spectrograms_heavy(df: pd.DataFrame, array_col="music_array", shape_col="shape_arr"):
+#     # Transform the music array value into a Tuple so that it can be read by the Model
+#     reshaped_arrays = []  # To store reshaped spectrograms
+#     valid_indices = []  # Track valid indices for potential filtering
 
-        except Exception as e:
-            print(f"Error processing row {i}: {e}")  # If an error occurs, print the issue
+#     for i in range(len(df)):
+#         try:
+#             value = df.iloc[i][array_col]
+#             shape_value = df.iloc[i][shape_col]
 
-    df = df.iloc[valid_indices].copy()  # Filter out invalid rows (optional, if you want to remove them)
-    df[array_col] = reshaped_arrays  # Replace the original column (music_array) with reshaped data
+#             # Ensure proper conversion
+#             if isinstance(value, str):
+#                 array_values = np.array(ast.literal_eval(value))  # Convert string to list, then NumPy array
+#             else:
+#                 array_values = np.array(value)
 
-    print("DATA RESHAPED")
-    return df
+#             original_shape = ast.literal_eval(shape_value) if isinstance(shape_value, str) else shape_value  # Ensure tuple format
+#             reshaped_array = array_values.reshape(original_shape)  # Reshape to its correct shape
+#             reshaped_arrays.append(reshaped_array)  # Store the reshaped spectrogram
+#             valid_indices.append(i)
+
+#         except Exception as e:
+#             print(f"Error processing row {i}: {e}")  # If an error occurs, print the issue
+
+#     df = df.iloc[valid_indices].copy()  # Filter out invalid rows (optional, if you want to remove them)
+#     df[array_col] = reshaped_arrays  # Replace the original column (music_array) with reshaped data
+
+#     print("DATA RESHAPED")
+#     return df
 
 ### ------------ Etape 3: Définir les X et y ------------
 # Define the X and y, initiate the train test split
-def preprocess_data_heavy(df: pd.DataFrame):
+# def preprocess_data_heavy(df: pd.DataFrame):
 
-    df = df.sample(frac=1) #mélange les données
+#     df = reshape_spectrograms(df, array_col="music_array", shape_col="shape_arr")
 
-    X = np.array(df["music_array"].values) #sélectionne le X
-    y = np.array(df["is_generated"].values) #sélectionne le y
+#     df = df.sample(frac=1) #mélange les données
 
-    X = np.expand_dims(np.stack(X), axis=-1)  ## Ensure correct shape
+#     X = np.array(df["music_array"].values) #sélectionne le X
+#     y = np.array(df["is_generated"].values) #sélectionne le y
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y) # Train test split
+#     X = np.expand_dims(np.stack(X), axis=-1)  ## Ensure correct shape
 
-    return X_train, X_test, y_train, y_test
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y) # Train test split
+
+#     return X_train, X_test, y_train, y_test
 
 ### ------------ Etape 4: 1er Modèle CNN léger ------------
 # CNN Model
@@ -129,7 +136,7 @@ def compile_model_cnn_heavy(model: models.Model, learning_rate=0.001):
         loss='binary_crossentropy', #For binary choix (0 or 1)
         metrics=['accuracy']
     )
-    print("MODEL COMPILED")
+    print("🎉​🎉​ MODEL COMPILED 🎉​🎉​")
     return model
 
 ### ------------ Etape 6 : Test le modèle ------------
@@ -146,7 +153,7 @@ def train_model_cnn_heavy(
     if TARGET == TARGET: #checkpoint to save the weight (if local, then local file, if not, then in Google bucket)
         checkpoint_path = LOCAL_PATH_SAVE_WEIGHT
     else:
-        checkpoint_path = checkpoint.model.keras
+        checkpoint_path = CLOUD_PATH_SAVE_WEIGHT
 
     early_stopping = EarlyStopping(monitor="val_loss", patience = 5, restore_best_weights=True) #stop training if val_loss doesn't improve, but goes anyway until 5 epochs (patience)
 
@@ -170,7 +177,7 @@ def train_model_cnn_heavy(
     if TARGET == 'gcloud': #to save the model in the g bucket if Target = cloud. Needs to be at the end as the model needs to be trained before saving
         upload_to_gcloud_heavy(checkpoint_path, "checkpoint_result", "checkpoint.model.keras")
 
-    print("MODEL TRAINED")
+    print("🏋️​🏋️​ MODEL TRAINED 🏋️​🏋️​")
 
     return model, history.history
 
@@ -178,6 +185,8 @@ def train_model_cnn_heavy(
 #print the result
 def evaluate_model_heavy(model, X_test, y_test):
     test_loss, test_acc = model.evaluate(X_test, y_test, verbose=2)
+
+    print(f"🎯​ FINAL MODEL PERFORMANCE 🎯​")
 
     print(f"💢💢 Loss : {test_loss:.4%} 💢💢")
     print(f"✅​✅​ Accuracy : {test_acc:.4%}✅​✅​")
