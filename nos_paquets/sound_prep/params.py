@@ -1,4 +1,3 @@
-### params.py
 
 import os
 import numpy as np
@@ -23,10 +22,7 @@ BUCKET_PROCESSED_DATA = os.environ.get("BUCKET_PROCESSED_DATA")
 INSTANCE = os.environ.get("INSTANCE")
 
 PATH_TO_RAW_DATA=os.environ.get('PATH_TO_RAW_DATA', "audio_deepfake_detector/raw_data")
-PATH_PROCESSED_DATA = os.path.join(
-    os.environ.get("PATH_PROCESSED_DATA", "audio_deepfake_detector/processed_data"),
-    f"music_preprocessed_{DURATION}sec.csv"
-)
+PATH_PROCESSED_DATA =  os.environ.get("PATH_PROCESSED_DATA")
 
 #### PATHS & DATA
 TARGET = os.environ.get('TARGET_ENV', "local") # à modifier selon la data que l'on vient prendre
