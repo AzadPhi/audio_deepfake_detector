@@ -9,38 +9,39 @@ import ast
 from nos_paquets.sound_prep.params import *
 
 ### ------------ Etape 1: Récuperer le CSV ------------
-def load_data(csv_path):
+#def load_data(csv_path):
 # Load dataset from a CSV file
-    df = pd.read_csv(csv_path)
-    return df
+#    df = pd.read_csv(csv_path)
+#    return df
 ### ------------ Etape 2: Reshape dataframe ------------
-def reshape_spectrograms(df: pd.DataFrame, array_col="music_array", shape_col="shape_arr"):
-    reshaped_arrays = []
-    valid_indices = []
+#def reshape_spectrograms(df: pd.DataFrame, array_col="music_array", shape_col="shape_arr"):
+#    reshaped_arrays = []
+    # valid_indices = []
 
-    for i in range(len(df)):
-        try:
-            value = df.iloc[i][array_col]
-            shape_value = df.iloc[i][shape_col]
+    # for i in range(len(df)):
+    #     try:
+    #         value = df.iloc[i][array_col]
+    #         shape_value = df.iloc[i][shape_col]
 
-            # Ensure proper conversion
-            if isinstance(value, str):
-                array_values = np.array(ast.literal_eval(value))
-            else:
-                array_values = np.array(value)
+    #         # Ensure proper conversion
+    #         if isinstance(value, str):
+    #             array_values = np.array(ast.literal_eval(value))
+    #         else:
+    #             array_values = np.array(value)
 
-            original_shape = ast.literal_eval(shape_value) if isinstance(shape_value, str) else shape_value
-            reshaped_array = array_values.reshape(original_shape)
-            reshaped_arrays.append(reshaped_array)
-            valid_indices.append(i)
+    #         original_shape = ast.literal_eval(shape_value) if isinstance(shape_value, str) else shape_value
+    #         reshaped_array = array_values.reshape(original_shape)
+    #         reshaped_arrays.append(reshaped_array)
+    #         valid_indices.append(i)
 
-        except Exception as e:
-            print(f"Error processing row {i}: {e}")
+    #     except Exception as e:
+    #         print(f"Error processing row {i}: {e}")
 
-    # Keep only valid rows
-    df = df.iloc[valid_indices].copy()
-    df[array_col] = reshaped_arrays
-    return df
+    # # Keep only valid rows
+    # df = df.iloc[valid_indices].copy()
+    # df[array_col] = reshaped_arrays
+    # return df
+
 
 ### ------------ Etape 3: Définir les X et y ------------
 # def preprocessed_ml(df: pd.DataFrame):

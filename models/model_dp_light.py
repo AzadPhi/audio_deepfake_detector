@@ -133,42 +133,46 @@ def compile_model_cnn_light(model: models.Model, learning_rate=0.05):
 ### ------------ Etape 6 : Test le modèle ------------
 # Define the function and input parameters
 def train_model_cnn_light(
-        model: models.Model, # The CNN model to be trained
+        model: models.Model,  # The CNN model to be trained
         X_train: np.ndarray,
         y_train: np.ndarray,
-        batch_size=256, # Number of samples per batch
-        validation_data=None,  # Overrides validation_split if yes
-        validation_split=0.3, # Percentage of training data for validation
+        batch_size=256,  # Number of samples per batch
+        validation_data=None,  # Overrides validation_split if provided
+        validation_split=0.3  # Percentage of training data for validation
     ):
 
-    if TARGET == 'local': #checkpoint to save the weight (if local, then local file, if not, then in Google bucket)
-        checkpoint_path = LOCAL_PATH_SAVE_WEIGHT
-    else:
-        checkpoint_path = CLOUD_PATH_SAVE_WEIGHT
+    # Always save localy
+    checkpoint_path = LOCAL_PATH_SAVE_WEIGHT
 
-    early_stopping = EarlyStopping(monitor="val_loss", patience = 5 ,restore_best_weights=True) #stop training if val_loss doesn't improve, but goes anyway until 5 epochs (patience)
+    early_stopping = EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True)
 
     checkpoint = ModelCheckpoint(
-        filepath=checkpoint_path,   # File where model is saved
-        monitor="val_loss",         # Save la validation loss
-        save_best_only=True,        # Save if it's the best pr le moment
+        filepath=checkpoint_path,
+        monitor="val_loss",
+        save_best_only=True,
+        save_weights_only=False,
         mode="min",
-        verbose=1
+        verbose=1,
+        save_freq="epoch",
     )
 
     history = model.fit(
         X_train, y_train,
-        epochs=30,#train the model during 30 epochs
+        epochs=30,  # Train the model for 30 epochs
         batch_size=batch_size,
         validation_data=validation_data,
         validation_split=validation_split if validation_data is None else 0.0,
-        callbacks=[early_stopping, checkpoint] # Use early stopping and save best model
+        callbacks=[early_stopping, checkpoint]  # Always save locally
     )
 
-    if TARGET == 'gcloud': #to save the model in the g bucket if Target = cloud. Needs to be at the end as the model needs to be trained before saving
-        upload_to_gcloud_light(checkpoint_path, "checkpoint_result", "checkpoint.model.keras")
+    # If running in Google Cloud, upload the model after training
+    if TARGET == 'gcloud':
+        cloud_checkpoint_path = CLOUD_PATH_SAVE_WEIGHT_LIGHT
+        upload_to_gcloud_light(checkpoint_path, cloud_checkpoint_path)
 
     print("🏋️​🏋️​ MODEL TRAINED 🏋️​🏋️​")
+    if TARGET == 'gcloud':
+        print(f"☁️ Model uploaded in Cloud ☁️")
 
     return model, history.history
 ### ------------ Etape 6.1 : Évaluer le modèle sur les données de test ------------
@@ -184,7 +188,7 @@ def evaluate_model_light(model, X_test, y_test):
 
 ### ------------ Step 7: Google Cloud Upload Function ------------
 # Checks if the model exists locally before uploading, connects to Google Cloud Storage, uploads the file to the specified cloud bucket, prints confirmation with the file’s GCS path. Not in the main as doesn't run the modle
-def upload_to_gcloud_light(local_model_path, bucket_name, destination_blob_name):
+def upload_to_gcloud_light(local_model_path, destination_blob_name):
     """Uploads a model file to Google Cloud Storage."""
 
     if not os.path.exists(local_model_path):
@@ -192,19 +196,19 @@ def upload_to_gcloud_light(local_model_path, bucket_name, destination_blob_name)
         return
 
     client = storage.Client()
-    bucket = client.bucket(bucket_name)
+    bucket = client.bucket(BUCKET_CHECKPOINT)
     blob = bucket.blob(destination_blob_name)
 
     blob.upload_from_filename(local_model_path)
-    print(f"Upload complete - file saved at: gs://{bucket_name}/{destination_blob_name}")
+    print("DATA UPLOADED IN THE CLOUD")
 
 ### ------------ Etape 8 : Execution ------------
-if __name__ == "__main__":
-    if TARGET == 'local':
-        csv_path = LOCAL_PATH_TO_RAW_DATA
-    else:
-        csv_path = PATH_PROCESSED_DATA
-    df = load_data_light(csv_path)
+#if __name__ == "__main__":
+#    if TARGET == 'local':
+#        csv_path = LOCAL_PATH_TO_RAW_DATA
+#    else:
+#        csv_path = PATH_PROCESSED_DATA
+#    df = load_data_light(csv_path)
 
     if df is not None:
 
