@@ -10,11 +10,15 @@ from tensorflow.keras import models
 from tensorflow.keras.layers import (Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization, GlobalAveragePooling2D)
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from typing import Tuple
+from google.cloud import storage
+
 from nos_paquets.sound_prep.params import *
 from models.model_dp_light import *
 from models.model_dp_heavy import *
-from google.cloud import storage
+from models.reshaping import *
 from models.models_ml.models_ml import *
+
+
 
 if __name__ == "__main__":
     if MODEL == "CNN_heavy":
@@ -22,14 +26,14 @@ if __name__ == "__main__":
             csv_path = LOCAL_PATH_TO_RAW_DATA  # Use the correct variable depending on the environment
         else:
             csv_path = PATH_PROCESSED_DATA
-        df = load_data_heavy(csv_path) ## Load the data
+        df = load_data(csv_path) ## Load the data
 
         print("DATA WILL BE RESHAPED")
 
         if df is not None:
-            df_reshaped = reshape_spectrograms_heavy(df, array_col="music_array", shape_col="shape_arr")
+            #df_reshaped = reshape_spectrograms_heavy(df, array_col="music_array", shape_col="shape_arr")
 
-            X_train, X_test, y_train, y_test = preprocess_data_heavy(df)
+            X_train, X_test, y_train, y_test = preprocess_data(df)
 
             model = model_cnn_heavy(X_train.shape[1:])
 
@@ -46,13 +50,13 @@ if __name__ == "__main__":
             csv_path = LOCAL_PATH_TO_RAW_DATA
         else:
             csv_path = PATH_PROCESSED_DATA
-        df = load_data_light(csv_path)
+        df = load_data(csv_path)
 
         if df is not None:
 
-            df_reshaped = reshape_spectrograms_light(df, array_col="music_array", shape_col="shape_arr")
+            # df_reshaped = reshape_spectrograms_light(df, array_col="music_array", shape_col="shape_arr")
 
-            X_train, X_test, y_train, y_test = preprocess_data_light(df)
+            X_train, X_test, y_train, y_test = preprocess_data(df)
 
             model = model_cnn_light(X_train.shape[1:])
 
