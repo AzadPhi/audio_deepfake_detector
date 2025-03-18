@@ -179,10 +179,9 @@ def train_model_cnn_light(
 def evaluate_model_light(model, X_test, y_test):
     test_loss, test_acc = model.evaluate(X_test, y_test, verbose=2)
 
-    print(f"🎯​ FINAL MODEL PERFORMANCE 🎯​")
-
-    print(f"💢💢 Loss : {test_loss:.4%} 💢💢")
-    print(f"✅​✅​ Accuracy : {test_acc:.4%} ✅​✅​")
+    print(f"🎯 FINAL MODEL PERFORMANCE 🎯")
+    print(f"💢💢 Loss : {test_loss:4f} 💢💢")
+    print(f"✅​✅​ Accuracy : {test_acc:.4%}✅​✅​")
 
     return test_loss, test_acc
 
