@@ -188,7 +188,7 @@ def evaluate_model_light(model, X_test, y_test):
 
 ### ------------ Step 7: Google Cloud Upload Function ------------
 # Checks if the model exists locally before uploading, connects to Google Cloud Storage, uploads the file to the specified cloud bucket, prints confirmation with the file’s GCS path. Not in the main as doesn't run the modle
-def upload_to_gcloud_light(local_model_path, bucket_name, destination_blob_name):
+def upload_to_gcloud_light(local_model_path, destination_blob_name):
     """Uploads a model file to Google Cloud Storage."""
 
     if not os.path.exists(local_model_path):
@@ -196,11 +196,11 @@ def upload_to_gcloud_light(local_model_path, bucket_name, destination_blob_name)
         return
 
     client = storage.Client()
-    bucket = client.bucket(bucket_name)
+    bucket = client.bucket(BUCKET_CHECKPOINT)
     blob = bucket.blob(destination_blob_name)
 
     blob.upload_from_filename(local_model_path)
-    print(f"Upload complete - file saved at: gs://{bucket_name}/{destination_blob_name}")
+    print("DATA UPLOADED IN THE CLOUD")
 
 ### ------------ Etape 8 : Execution ------------
 #if __name__ == "__main__":
