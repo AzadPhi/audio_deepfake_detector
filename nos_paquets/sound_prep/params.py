@@ -1,4 +1,3 @@
-### params.py
 
 import os
 import numpy as np
@@ -24,7 +23,9 @@ INSTANCE = os.environ.get("INSTANCE")
 BUCKET_CHECKPOINT = os.environ.get("BUCKET_CHECKPOINT")
 
 PATH_TO_RAW_DATA=os.environ.get('PATH_TO_RAW_DATA', "audio_deepfake_detector/raw_data")
-PATH_PROCESSED_DATA = os.environ.get("PATH_PROCESSED_DATA", "audio_deepfake_detector/processed_data")
+PATH_PROCESSED_DATA =  os.environ.get("PATH_PROCESSED_DATA")
+
+
 
 #### PATHS & DATA
 TARGET = os.environ.get('TARGET_ENV', "local") # à modifier selon la data que l'on vient prendre

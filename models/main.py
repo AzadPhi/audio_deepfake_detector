@@ -80,7 +80,7 @@ if __name__ == "__main__":
         df = load_data(csv_path)
 
         if df is not None :
-            df_reshaped = reshape_spectrograms_light(df, array_col="music_array", shape_col="shape_arr")
+            df_reshaped = reshape_spectrograms(df, array_col="music_array", shape_col="shape_arr")
             X = df_reshaped["music_array"]
             y = df_reshaped["is_generated"]
             X_flattened = np.array([x.flatten() for x in X.values])
@@ -100,7 +100,7 @@ if __name__ == "__main__":
         df = load_data(csv_path)
 
         if df is not None :
-            df_reshaped = reshape_spectrograms_light(df, array_col="music_array", shape_col="shape_arr")
+            df_reshaped = reshape_spectrograms(df, array_col="music_array", shape_col="shape_arr")
             X = df_reshaped["music_array"]
             y = df_reshaped["is_generated"]
             X_flattened = np.array([x.flatten() for x in X.values])
@@ -120,7 +120,7 @@ if __name__ == "__main__":
         df = load_data(csv_path)
 
         if df is not None :
-            df_reshaped = reshape_spectrograms_light(df, array_col="music_array", shape_col="shape_arr")
+            df_reshaped = reshape_spectrograms(df, array_col="music_array", shape_col="shape_arr")
             X = df_reshaped ["music_array"]
             y = df_reshaped ["is_generated"]
             X_flattened = np.array([x.flatten() for x in X.values])
