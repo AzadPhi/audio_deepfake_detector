@@ -167,7 +167,7 @@ def train_model_cnn_light(
 
     # If running in Google Cloud, upload the model after training
     if TARGET == 'gcloud':
-        cloud_checkpoint_path = CLOUD_PATH_SAVE_WEIGHT
+        cloud_checkpoint_path = CLOUD_PATH_SAVE_WEIGHT_LIGHT
         upload_to_gcloud_light(checkpoint_path, cloud_checkpoint_path)
 
     print("🏋️​🏋️​ MODEL TRAINED 🏋️​🏋️​")
