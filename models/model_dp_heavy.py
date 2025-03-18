@@ -10,70 +10,63 @@ from tensorflow.keras import models
 from tensorflow.keras.layers import (Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization, GlobalAveragePooling2D)
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from typing import Tuple
+from nos_paquets.sound_prep.params import *
 from google.cloud import storage
 
-from nos_paquets.sound_prep.params import *
-#from models.reshaping import *
-from models.reshaping import load_data, reshape_spectrograms
 
+### ------------ Etape 1: Récuperer le CSV ------------
+#def load_data_heavy(csv_path):
+# Load dataset from a CSV file
+#    df = pd.read_csv(csv_path)
+#    print("​🔥​🔥 DATA LOADED ​🔥​🔥")
+#    return df
 
+### ------------ Etape 2: Reshape dataframe ------------
 
+#def reshape_spectrograms_heavy(df: pd.DataFrame, array_col="music_array", shape_col="shape_arr"):
+    # Transform the music array value into a Tuple so that it can be read by the Model
+#    reshaped_arrays = []  # To store reshaped spectrograms
+#    valid_indices = []  # Track valid indices for potential filtering
 
-# ### ------------ Etape 1: Récuperer le CSV ------------
-# def load_data_heavy(csv_path):
-# # Load dataset from a CSV file
-#     df = pd.read_csv(csv_path)
-#     print("DATA LOADED")
-#     return df
+#    for i in range(len(df)):
+#        try:
+#           value = df.iloc[i][array_col]
+#            shape_value = df.iloc[i][shape_col]
 
-# ### ------------ Etape 2: Reshape dataframe ------------
+            # Ensure proper conversion
+#            if isinstance(value, str):
+#                array_values = np.array(ast.literal_eval(value))  # Convert string to list, then NumPy array
+#            else:
+#                array_values = np.array(value)
 
-# def reshape_spectrograms_heavy(df: pd.DataFrame, array_col="music_array", shape_col="shape_arr"):
-#     # Transform the music array value into a Tuple so that it can be read by the Model
-#     reshaped_arrays = []  # To store reshaped spectrograms
-#     valid_indices = []  # Track valid indices for potential filtering
+#            original_shape = ast.literal_eval(shape_value) if isinstance(shape_value, str) else shape_value  # Ensure tuple format
+#            reshaped_array = array_values.reshape(original_shape)  # Reshape to its correct shape
+#            reshaped_arrays.append(reshaped_array)  # Store the reshaped spectrogram
+#            valid_indices.append(i)
 
-#     for i in range(len(df)):
-#         try:
-#             value = df.iloc[i][array_col]
-#             shape_value = df.iloc[i][shape_col]
+#        except Exception as e:
+#            print(f"Error processing row {i}: {e}")  # If an error occurs, print the issue
 
-#             # Ensure proper conversion
-#             if isinstance(value, str):
-#                 array_values = np.array(ast.literal_eval(value))  # Convert string to list, then NumPy array
-#             else:
-#                 array_values = np.array(value)
+#    df = df.iloc[valid_indices].copy()  # Filter out invalid rows (optional, if you want to remove them)
+#    df[array_col] = reshaped_arrays  # Replace the original column (music_array) with reshaped data
 
-#             original_shape = ast.literal_eval(shape_value) if isinstance(shape_value, str) else shape_value  # Ensure tuple format
-#             reshaped_array = array_values.reshape(original_shape)  # Reshape to its correct shape
-#             reshaped_arrays.append(reshaped_array)  # Store the reshaped spectrogram
-#             valid_indices.append(i)
-
-#         except Exception as e:
-#             print(f"Error processing row {i}: {e}")  # If an error occurs, print the issue
-
-#     df = df.iloc[valid_indices].copy()  # Filter out invalid rows (optional, if you want to remove them)
-#     df[array_col] = reshaped_arrays  # Replace the original column (music_array) with reshaped data
-
-#     print("DATA RESHAPED")
-#     return df
+#    print("✔️​✔️​ DATA RESHAPED ✔️​✔️​")
+#    return df
 
 ### ------------ Etape 3: Définir les X et y ------------
 # Define the X and y, initiate the train test split
-# def preprocess_data_heavy(df: pd.DataFrame):
+#def preprocess_data_heavy(df: pd.DataFrame):
+#    df = reshape_spectrograms_heavy(df, array_col="music_array", shape_col="shape_arr")
+#    df = df.sample(frac=1) #mélange les données
 
-#     df = reshape_spectrograms(df, array_col="music_array", shape_col="shape_arr")
+#    X = np.stack(df["music_array"].values)  # Stack into a single NumPy array
+#    y = np.array(df["is_generated"].values)  # Sélectionne le y
 
-#     df = df.sample(frac=1) #mélange les données
+#    X = np.expand_dims(X, axis=-1)
 
-#     X = np.array(df["music_array"].values) #sélectionne le X
-#     y = np.array(df["is_generated"].values) #sélectionne le y
+#    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y) # Train test split
 
-#     X = np.expand_dims(np.stack(X), axis=-1)  ## Ensure correct shape
-
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y) # Train test split
-
-#     return X_train, X_test, y_train, y_test
+#    return X_train, X_test, y_train, y_test
 
 ### ------------ Etape 4: 1er Modèle CNN léger ------------
 # CNN Model
@@ -82,32 +75,32 @@ def model_cnn_heavy(input_shape, use_global_pooling=True):
     model = models.Sequential()
 
     model.add(Conv2D(16, (3,3), padding='same', input_shape=input_shape))
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D((2,2)))
 
     model.add(Conv2D(32, (3,3), padding='same'))
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D((2,2)))
 
     model.add(Conv2D(64, (3,3), padding='same'))
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D((2,2)))
 
     model.add(Conv2D(128, (3,3), padding='same'))
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D((2,2)))
 
 
     model.add(Conv2D(256, (3,3), padding='same'))
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D((2,2)))
@@ -118,7 +111,7 @@ def model_cnn_heavy(input_shape, use_global_pooling=True):
         model.add(Flatten())
 
     model.add(Dense(512))
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
 
@@ -134,50 +127,54 @@ def compile_model_cnn_heavy(model: models.Model, learning_rate=0.001):
     model.compile(
         optimizer= tf.keras.optimizers.Adam(learning_rate=learning_rate),
         loss='binary_crossentropy', #For binary choix (0 or 1)
-        metrics=['accuracy']
+        metrics=['accuracy'] #Calculates how often predictions equal labels.
     )
-    print("🎉​🎉​ MODEL COMPILED 🎉​🎉​")
+    print("📣​📣​ MODEL COMPILED 📣​📣​")
     return model
 
 ### ------------ Etape 6 : Test le modèle ------------
 # Define the function and input parameters
 def train_model_cnn_heavy(
-        model: models.Model, # The CNN model to be trained
+        model: models.Model,  # The CNN model to be trained
         X_train: np.ndarray,
         y_train: np.ndarray,
-        batch_size=256, # Number of samples per batch
-        validation_data=None, # Overrides validation_split if yes
-        validation_split=0.3, # Percentage of training data for validation
+        batch_size=256,  # Number of samples per batch
+        validation_data=None,  # Overrides validation_split if provided
+        validation_split=0.3  # Percentage of training data for validation
     ):
 
-    if TARGET == TARGET: #checkpoint to save the weight (if local, then local file, if not, then in Google bucket)
-        checkpoint_path = LOCAL_PATH_SAVE_WEIGHT
-    else:
-        checkpoint_path = CLOUD_PATH_SAVE_WEIGHT
+    # Always save localy
+    checkpoint_path = LOCAL_PATH_SAVE_WEIGHT
 
-    early_stopping = EarlyStopping(monitor="val_loss", patience = 5, restore_best_weights=True) #stop training if val_loss doesn't improve, but goes anyway until 5 epochs (patience)
+    early_stopping = EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True)
 
     checkpoint = ModelCheckpoint(
-        filepath=checkpoint_path,   # File where model is saved
-        monitor="val_loss",         # Save la validation loss (checkpoint based on this, saves the best model)
-        save_best_only=True,        # Save if it's the best pr le moment
+        filepath=checkpoint_path,
+        monitor="val_loss",
+        save_best_only=True,
+        save_weights_only=False,
         mode="min",
-        verbose=1
+        verbose=1,
+        save_freq="epoch",
     )
 
     history = model.fit(
         X_train, y_train,
-        epochs=30, #train the model during 30 epochs
+        epochs=30,  # Train the model for 30 epochs
         batch_size=batch_size,
         validation_data=validation_data,
         validation_split=validation_split if validation_data is None else 0.0,
-        callbacks=[early_stopping, checkpoint] # Use early stopping and save best model
+        callbacks=[early_stopping, checkpoint]  # Always save locally
     )
 
-    if TARGET == 'gcloud': #to save the model in the g bucket if Target = cloud. Needs to be at the end as the model needs to be trained before saving
-        upload_to_gcloud_heavy(checkpoint_path, "checkpoint_result", "checkpoint.model.keras")
+    # If running in Google Cloud, upload the model after training
+    if TARGET == 'gcloud':
+        cloud_checkpoint_path = CLOUD_PATH_SAVE_WEIGHT
+        upload_to_gcloud_heavy(checkpoint_path, cloud_checkpoint_path)
 
     print("🏋️​🏋️​ MODEL TRAINED 🏋️​🏋️​")
+    if TARGET == 'gcloud':
+        print(f"☁️ Model uploaded in Cloud ☁️")
 
     return model, history.history
 
@@ -186,9 +183,8 @@ def train_model_cnn_heavy(
 def evaluate_model_heavy(model, X_test, y_test):
     test_loss, test_acc = model.evaluate(X_test, y_test, verbose=2)
 
-    print(f"🎯​ FINAL MODEL PERFORMANCE 🎯​")
-
-    print(f"💢💢 Loss : {test_loss:.4%} 💢💢")
+    print(f"🎯 FINAL MODEL PERFORMANCE 🎯")
+    print(f"💢💢 Loss : {test_loss:4f} 💢💢")
     print(f"✅​✅​ Accuracy : {test_acc:.4%}✅​✅​")
 
     return test_loss, test_acc
