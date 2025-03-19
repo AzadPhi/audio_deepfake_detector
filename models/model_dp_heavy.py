@@ -14,59 +14,6 @@ from nos_paquets.sound_prep.params import *
 from google.cloud import storage
 
 
-### ------------ Etape 1: Récuperer le CSV ------------
-#def load_data_heavy(csv_path):
-# Load dataset from a CSV file
-#    df = pd.read_csv(csv_path)
-#    print("​🔥​🔥 DATA LOADED ​🔥​🔥")
-#    return df
-
-### ------------ Etape 2: Reshape dataframe ------------
-
-#def reshape_spectrograms_heavy(df: pd.DataFrame, array_col="music_array", shape_col="shape_arr"):
-    # Transform the music array value into a Tuple so that it can be read by the Model
-#    reshaped_arrays = []  # To store reshaped spectrograms
-#    valid_indices = []  # Track valid indices for potential filtering
-
-#    for i in range(len(df)):
-#        try:
-#           value = df.iloc[i][array_col]
-#            shape_value = df.iloc[i][shape_col]
-
-            # Ensure proper conversion
-#            if isinstance(value, str):
-#                array_values = np.array(ast.literal_eval(value))  # Convert string to list, then NumPy array
-#            else:
-#                array_values = np.array(value)
-
-#            original_shape = ast.literal_eval(shape_value) if isinstance(shape_value, str) else shape_value  # Ensure tuple format
-#            reshaped_array = array_values.reshape(original_shape)  # Reshape to its correct shape
-#            reshaped_arrays.append(reshaped_array)  # Store the reshaped spectrogram
-#            valid_indices.append(i)
-
-#        except Exception as e:
-#            print(f"Error processing row {i}: {e}")  # If an error occurs, print the issue
-
-#    df = df.iloc[valid_indices].copy()  # Filter out invalid rows (optional, if you want to remove them)
-#    df[array_col] = reshaped_arrays  # Replace the original column (music_array) with reshaped data
-
-#    print("✔️​✔️​ DATA RESHAPED ✔️​✔️​")
-#    return df
-
-### ------------ Etape 3: Définir les X et y ------------
-# Define the X and y, initiate the train test split
-#def preprocess_data_heavy(df: pd.DataFrame):
-#    df = reshape_spectrograms_heavy(df, array_col="music_array", shape_col="shape_arr")
-#    df = df.sample(frac=1) #mélange les données
-
-#    X = np.stack(df["music_array"].values)  # Stack into a single NumPy array
-#    y = np.array(df["is_generated"].values)  # Sélectionne le y
-
-#    X = np.expand_dims(X, axis=-1)
-
-#    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y) # Train test split
-
-#    return X_train, X_test, y_train, y_test
 
 ### ------------ Etape 4: 1er Modèle CNN léger ------------
 # CNN Model
@@ -202,26 +149,3 @@ def upload_to_gcloud_heavy(local_model_path, destination_blob_name):
     blob.upload_from_filename(local_model_path)
     print("DATA UPLOADED IN THE CLOUD")
 
-
-### ------------ Etape 8: Execution ------------
-if __name__ == "__main__":
-    if TARGET == 'local':  # Fix the comparison operator
-        csv_path = LOCAL_PATH_TO_RAW_DATA  # Use the correct variable depending on the environment
-    else:
-        csv_path = PATH_PROCESSED_DATA
-    df = load_data_heavy(csv_path) ## Load the data
-
-    if df is not None:
-        df_reshaped = reshape_spectrograms_heavy(df, array_col="music_array", shape_col="shape_arr")
-
-        X_train, X_test, y_train, y_test = preprocess_data_heavy(df)
-
-        model = model_cnn_heavy(X_train.shape[1:])
-
-        model_compiled = compile_model_cnn_heavy(model)
-
-        model_trained, history = train_model_cnn_heavy(model, X_train, y_train, validation_data=(X_test, y_test))
-
-        evaluate_model_heavy(model_trained, X_test, y_test)
-    else:
-        print("Heavy not working - Retry")

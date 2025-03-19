@@ -36,4 +36,4 @@ mlruns
 
 # data folders
 raw_data/
-*code/A*
+*/code/A*

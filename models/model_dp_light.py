@@ -17,68 +17,6 @@ from models.reshaping import *
 from google.cloud import storage
 
 
-# ### ------------ Etape 1: Récuperer le CSV ------------
-# # Load dataset from a CSV file
-# def load_data_light(csv_path):
-#     df = pd.read_csv(csv_path)
-#     print("DATA LOADED")
-#     return df
-
-# ### ------------ Etape 2: Reshape dataframe ------------
-# def reshape_spectrograms_light(df: pd.DataFrame, array_col="music_array", shape_col="shape_arr"):
-# # Transform the music array value into a Tuple so that it can be read by the Model
-#     reshaped_arrays = [] #to store reshaped spectrograms
-#     valid_indices = []
-
-#     for i in range(len(df)):
-#         try:
-#             value = df.iloc[i][array_col]
-#             shape_value = df.iloc[i][shape_col]
-
-#             # Ensure proper conversion
-#             if isinstance(value, str):
-#                 array_values = np.array(ast.literal_eval(value)) #Read the spectrogram from music_array, converts the string into a Python list, transforms it into a NumPy array
-#             else:
-#                 array_values = np.array(value)
-
-#             original_shape = ast.literal_eval(shape_value) if isinstance(shape_value, str) else shape_value # Read the original shape of the spectrogram and convert to a Tuple
-#             reshaped_array = array_values.reshape(original_shape) # Reshape the spectrogram to its correct shape
-#             reshaped_arrays.append(reshaped_array) # Store the reshaped spectrogram in a list
-#             valid_indices.append(i)
-
-#         except Exception as e:
-#             print(f"Error processing row {i}: {e}") # If an error occurs, print the issue
-
-#     # Keep only valid rows
-#     df = df.iloc[valid_indices].copy()
-#     df[array_col] = reshaped_arrays #Replace the original column (music_array) with reshaped data
-
-#     print(reshaped_arrays[0].shape)
-#     print(type(df[array_col][0])) # ICI C'EST BIEN UN NP ARRAY
-
-#     print("DATA RESHAPED")
-#     return df
-
-### ------------ Etape 3: Définir les X et y ------------
-# Define the X and y, initiate the train test split
-# def preprocess_data_light(df: pd.DataFrame):
-
-#     df = reshape_spectrograms(df, array_col="music_array", shape_col="shape_arr")
-
-#     df = df.sample(frac=1) #mélange les données
-
-#     print(type(df["music_array"][0])) # ICI C'EST UNE STRING
-#     print(df["music_array"][0])
-
-#     X = np.array(df["music_array"].values) #sélectionne le X
-#     y = np.array(df["is_generated"].values) #sélectionne le y
-
-#     X = np.expand_dims(np.stack(X), axis=-1) ## Ensure correct shape mais ca doit changer
-
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y) # Train test split
-
-#     return X_train, X_test, y_train, y_test
-
 ### ------------ Etape 4: 1er Modèle CNN léger ------------
 def model_cnn_light(input_shape, use_global_pooling=True):
     model = models.Sequential()
@@ -200,28 +138,3 @@ def upload_to_gcloud_light(local_model_path, destination_blob_name):
 
     blob.upload_from_filename(local_model_path)
     print("DATA UPLOADED IN THE CLOUD")
-
-### ------------ Etape 8 : Execution ------------
-#if __name__ == "__main__":
-#    if TARGET == 'local':
-#        csv_path = LOCAL_PATH_TO_RAW_DATA
-#    else:
-#        csv_path = PATH_PROCESSED_DATA
-#    df = load_data_light(csv_path)
-
-    if df is not None:
-
-        df_reshaped = reshape_spectrograms_light(df, array_col="music_array", shape_col="shape_arr")
-
-        X_train, X_test, y_train, y_test = preprocess_data_light(df)
-
-        model = model_cnn_light(X_train.shape[1:])
-
-        model_compiled = compile_model_cnn_light(model)
-
-        model_trained, history = train_model_cnn_light(model, X_train, y_train, validation_data=(X_test, y_test))
-
-        evaluate_model_light(model_trained, X_test, y_test)
-
-    else:
-        print("Light not working - Retry")
