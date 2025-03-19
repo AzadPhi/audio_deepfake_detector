@@ -32,7 +32,6 @@ if __name__ == "__main__":
         print("DATA WILL BE RESHAPED")
 
         if df is not None:
-            #df_reshaped = reshape_spectrograms_heavy(df, array_col="music_array", shape_col="shape_arr")
 
             X_train, X_test, y_train, y_test = preprocess_data(df)
 
@@ -55,7 +54,6 @@ if __name__ == "__main__":
 
         if df is not None:
 
-            # df_reshaped = reshape_spectrograms_light(df, array_col="music_array", shape_col="shape_arr")
 
             X_train, X_test, y_train, y_test = preprocess_data(df)
 
