@@ -3,6 +3,8 @@
 *nohup.out
 *.out
 
+*tmp*
+
 # OS generated files #
 ######################
 .DS_Store
@@ -38,4 +40,5 @@ mlruns
 raw_data/
 */code/A*
 **/data_directory/**
-model_saved/** */
+model_saved/**
+temp/

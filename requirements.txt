@@ -25,3 +25,6 @@ scikit-learn
 
 # Cloud Storage
 google-cloud-storage
+
+
+streamlit

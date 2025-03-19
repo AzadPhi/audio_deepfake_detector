@@ -1,9 +1,13 @@
 FROM python:3.10.6-buster
 
-COPY nos_paquets /nos_paquets
-COPY models /models
-COPY requirements.txt /requirements.txt
-COPY api /api
+WORKDIR app
+
+COPY nos_paquets nos_paquets
+COPY models models
+COPY requirements.txt requirements.txt
+COPY api api
+
+RUN mkdir -p temp
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
