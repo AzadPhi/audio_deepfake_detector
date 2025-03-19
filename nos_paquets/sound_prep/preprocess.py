@@ -116,7 +116,8 @@ def audio_to_melspectrogram(conf, audio):
 
 ### ------------ Etape 4: Réunion des deux fonctions ------------
 
-def read_as_melspectrogram(conf, pathname, trim_long_data=False):
+def read_as_melspectrogram(conf, pathname, trim_long_data=True):
+    # le trim_long_data était par défaut en FALSE / en TRUE dans la function read_audio : j'ai mis TRUE par défaut dans les deux
 
     try:
         x = read_audio(conf, pathname, trim_long_data)
