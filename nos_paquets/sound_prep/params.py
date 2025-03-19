@@ -39,5 +39,8 @@ LOCAL_PATH_SAVE_WEIGHT = os.environ.get('LOCAL_PATH_SAVE_WEIGHT', 'code/AzadPhi/
 CLOUD_PATH_SAVE_WEIGHT_HEAVY = os.environ.get('CLOUD_PATH_SAVE_WEIGHT_HEAVY', 'gs://checkpoint_result/Model_heavy/checkpoint.model.keras' )
 CLOUD_PATH_SAVE_WEIGHT_LIGHT = os.environ.get('CLOUD_PATH_SAVE_WEIGHT_LIGHT', 'gs://checkpoint_result/Model_light/checkpoint.model.keras' )
 
+LOCAL_REGISTRY_MODEL_PATH = os.environ.get('LOCAL_REGISTRY_MODEL_PATH')
+LOCAL_PATH_TO_MODEL = os.environ.get('LOCAL_PATH_TO_MODEL')
+
 #---Model
 MODEL = os.environ.get("MODEL")
