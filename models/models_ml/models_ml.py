@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 import os
 import ast
 from nos_paquets.sound_prep.params import *
+import pickle
 
 ### ------------ Etape 1: Récuperer le CSV ------------
 #def load_data(csv_path):
@@ -69,15 +70,19 @@ def SVCModel_linear(kernel='linear', C=0.5):
 
 def KNN_model(n_neighbors = 10):
     model_KNN = KNeighborsClassifier(n_neighbors=n_neighbors)
+    return KNN_model
 
 ### ------------ Etape 5: Train models------------
 
 def train_models(model, X_train, y_train):
     model.fit(X_train,y_train)
+    with open("model_ml.pkl", "wb") as file:
+        pickle.dump(model, file)
     return model
 
 ### ------------ Etape 5: Test model ------------
 
 def test_models(model,X_test, y_test, scoring = 'accuracy'):
     score = model.score(X_test, y_test)
+    print(score)
     return score
