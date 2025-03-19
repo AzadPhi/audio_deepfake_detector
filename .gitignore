@@ -37,3 +37,4 @@ mlruns
 # data folders
 raw_data/
 */code/A*
+*.model.keras
