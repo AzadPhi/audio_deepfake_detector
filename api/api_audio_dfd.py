@@ -4,17 +4,18 @@ import numpy as np
 import librosa
 import os
 import tensorflow as tf
-from fastapi import FastAPI
+# from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from google.cloud import storage
 import tempfile
-
+import io
+# from click import File
+import shutil
 from pydantic import BaseModel
 
 from nos_paquets.sound_prep.params import *
 from nos_paquets.sound_prep.preprocess import *
-
-
 
 
 def load_model():
@@ -32,8 +33,9 @@ def load_model():
 
     model = tf.keras.models.load_model(model_local_path)
 
-    return model
+    print("✅ Model loaded successfully")
 
+    return model
 
 
 app = FastAPI()
@@ -50,17 +52,32 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-class AudioInput(BaseModel):
-    file_path: str  # Receives the file path
 
-audio = AudioInput(file_path=LOCAL_PATH_TO_RAW_DATA)
+# @app.post("/upload-audio")
+# async def upload_audio(file: UploadFile = File(...)):
+#     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+
+#     # Save the uploaded file locally
+#     with open(file_path, "wb") as buffer:
+#         buffer.write(await file.read())
+
+#     return {"file_path": file_path, "message": "File successfully uploaded"}
+
+
 
 @app.post("/predict")
-async def predict(audio: AudioInput):
+#async def predict(audio: AudioInput):
+async def predict(file: UploadFile = File(...)):
     """makes a prediction :
             - it will first download locally the audio file
             - it will process the audio file and convert it into mel-spectrogramm
             - returns if it is AI generated or not"""
+
+    tmp_filename = f"./temp/{file.filename}"
+
+
+    with open(tmp_filename, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
 
     conf = Conf()
     conf.sampling_rate=16000
@@ -71,10 +88,14 @@ async def predict(audio: AudioInput):
     conf.fmax=conf.sampling_rate//2
     conf.n_fft=conf.n_mels*20
     conf.samples=conf.sampling_rate * conf.duration
-    print(audio.file_path)
 
-    X = read_as_melspectrogram(conf=conf,
-                               pathname=audio.file_path)
+    print(tmp_filename)
+
+    X = read_as_melspectrogram(conf=conf, pathname=tmp_filename)
+
+    # os.remove(tmp_filename)
+
+    # X = read_as_melspectrogram(conf=conf, pathname=io.BytesIO(await file.read()))
 
 
     X = X.flatten()
@@ -92,6 +113,12 @@ async def predict(audio: AudioInput):
     else:
         print("This sound has been created by real humans")
         return "This sound has been created by real humans"
+
+
+# class AudioInput(BaseModel):
+#     file_path: str  # Receives the file path
+
+# audio = AudioInput(file_path=LOCAL_PATH_TO_RAW_DATA)
 
 @app.get("/predict_get")
 async def predict_get(audio):

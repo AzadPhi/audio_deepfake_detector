@@ -44,3 +44,5 @@ LOCAL_PATH_TO_MODEL = os.environ.get('LOCAL_PATH_TO_MODEL')
 
 #---Model
 MODEL = os.environ.get("MODEL")
+
+SERVICE_URL = os.environ.get("SERVICE_URL")

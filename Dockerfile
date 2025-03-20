@@ -9,7 +9,6 @@ COPY api api
 
 RUN mkdir -p temp
 
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 CMD uvicorn api.api_audio_dfd:app --host 0.0.0.0 --port $PORT
