@@ -1,7 +1,12 @@
 .env
+.env.yaml
 
 *nohup.out
 *.out
+
+*tmp*
+*.model.keras
+model_saved/**
 
 # OS generated files #
 ######################
@@ -37,4 +42,6 @@ mlruns
 # data folders
 raw_data/
 */code/A*
-*.model.keras
+**/data_directory/**
+
+
