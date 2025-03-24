@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import os
 import ast
-from nos_paquets.sound_prep.params import *
+from nos_paquets.params import *
 import pickle
 
 ### ------------ Etape 1: Récuperer le CSV ------------

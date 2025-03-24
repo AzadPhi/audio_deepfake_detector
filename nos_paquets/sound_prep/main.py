@@ -1,4 +1,4 @@
-from nos_paquets.sound_prep.params import *
+from nos_paquets.params import *
 from nos_paquets.sound_prep.preprocess import *
 from pathlib import Path
 from google.cloud.storage import Client, transfer_manager

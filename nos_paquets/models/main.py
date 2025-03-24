@@ -12,7 +12,7 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from typing import Tuple
 from google.cloud import storage
 
-from nos_paquets.sound_prep.params import *
+from nos_paquets.params import *
 from models.model_dp_light import *
 from models.model_dp_heavy import *
 from models.reshaping import *

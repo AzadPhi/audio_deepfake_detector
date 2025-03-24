@@ -14,7 +14,7 @@ import io
 import shutil
 from pydantic import BaseModel
 
-from nos_paquets.sound_prep.params import *
+from nos_paquets.params import *
 from nos_paquets.sound_prep.preprocess import *
 
 

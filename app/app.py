@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import tempfile
 import os
-from nos_paquets.sound_prep.params import *
+from nos_paquets.params import *
 
 
 st.title("AI-Generated Music Detector")

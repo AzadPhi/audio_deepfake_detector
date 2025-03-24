@@ -12,7 +12,7 @@ from tensorflow.keras import models
 from tensorflow.keras.layers import (Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization, GlobalAveragePooling2D)
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from typing import Tuple
-from nos_paquets.sound_prep.params import *
+from nos_paquets.params import *
 from models.reshaping import *
 from google.cloud import storage
 

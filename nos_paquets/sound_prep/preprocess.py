@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 import IPython.display as ipd
 import pandas as pd
-from nos_paquets.sound_prep.params import *
+from nos_paquets.params import *
 from datetime import datetime
 
 
