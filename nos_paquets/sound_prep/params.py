@@ -35,7 +35,8 @@ LOCAL_PATH_TO_RAW_DATA= os.environ.get('LOCAL_PATH_TO_RAW_DATA', 'code/NicoTerli
 LOCAL_PATH_TO_RAW_DATA_PAU= os.environ.get('LOCAL_PATH_TO_RAW_DATA', 'code/AzadPhi/audio_deepfake_detector/data/1000_final.csv')
 
 #--- CheckPoint_Result
-LOCAL_PATH_SAVE_WEIGHT = os.environ.get('LOCAL_PATH_SAVE_WEIGHT', 'code/AzadPhi/audio_deepfake_detector/ModelCheckpoint/checkpoint.model.keras')
+LOCAL_PATH_SAVE_WEIGHT_HEAVY = os.environ.get('LOCAL_PATH_SAVE_WEIGHT_HEAVY', 'code/AzadPhi/audio_deepfake_detector/ModelCheckpoint/Heavy/checkpoint.model.keras')
+LOCAL_PATH_SAVE_WEIGHT_LIGHT = os.environ.get('LOCAL_PATH_SAVE_WEIGHT_LIGHT', 'code/AzadPhi/audio_deepfake_detector/ModelCheckpoint/Light/checkpoint.model.keras')
 CLOUD_PATH_SAVE_WEIGHT_HEAVY = os.environ.get('CLOUD_PATH_SAVE_WEIGHT_HEAVY', 'gs://checkpoint_result/Model_heavy/checkpoint.model.keras' )
 CLOUD_PATH_SAVE_WEIGHT_LIGHT = os.environ.get('CLOUD_PATH_SAVE_WEIGHT_LIGHT', 'gs://checkpoint_result/Model_light/checkpoint.model.keras' )
 
